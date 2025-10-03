@@ -1,0 +1,64 @@
+[
+  {
+    "name": "Mayamalavagowla",
+    "type": "Melakarta",
+    "arohana": ["S", "R1", "G3", "M1", "P", "D1", "N3", "S"],
+    "avarohana": ["S", "N3", "D1", "P", "M1", "G3", "R1", "S"]
+
+  },
+  {
+    "name": "Shankarabharanam",
+    "type": "Melakarta",
+    "arohana": ["S", "R2", "G3", "M1", "P", "D2", "N3", "S"],
+    "avarohana": ["S", "N3", "D2", "P", "M1", "G3", "R2", "S"]
+
+  },
+  {
+    "name": "Mohana",
+    "type": "Janya (Audava)",
+    "arohana": ["S", "R2", "G3", "P", "D2", "S"],
+    "avarohana": ["S", "D2", "P", "G3", "R2", "S"],
+    "parent": "Shankarabharanam"
+  },
+  {
+    "name": "Hamsadhwani",
+    "type": "Janya (Audava)",
+    "arohana": ["S", "R2", "G3", "P", "N3", "S"],
+    "avarohana": ["S", "N3", "P", "G3", "R2", "S"],
+    "parent": "Shankarabharanam"
+  },
+  {
+    "name": "Kalyani",
+    "type": "Melakarta",
+    "arohana": ["S", "R2", "G3", "M2", "P", "D2", "N3", "S"],
+    "avarohana": ["S", "N3", "D2", "P", "M2", "G3", "R2", "S"]
+  },
+  {
+    "name": "Hindolam",
+    "type": "Janya (Audava)",
+    "arohana": ["S", "G2", "M1", "D1", "N2", "S"],
+    "avarohana": ["S", "N2", "D1", "M1", "G2", "S"],
+    "parent": "Natabhairavi"
+  },
+  {
+    "name": "Malahari",
+    "type": "Janya (Audava Shadava)",
+    "arohana": ["S", "R1", "M1", "P", "D1", "S"],
+    "avarohana": ["S", "D1", "P", "M1", "G3", "R1", "S"],
+    "parent": "Mayamalavagowla"
+  },
+  {
+    "name": "Shuddha Saveri",
+    "type": "Janya (Audava)",
+    "arohana": ["S", "R2", "M1", "P", "D2", "S"],
+    "avarohana": ["S", "D2", "P", "M1", "R2", "S"],
+    "parent": "Shankarabharanam"
+  },
+  {
+    "name": "Niroshta",
+    "type": "Janya (Audava)",
+    "arohana": ["S", "R2", "G2", "D2", "N3", "S"],
+    "avarohana": ["S", "N3", "D2","G2", "R2", "S"],
+    "parent": "Shankarabharanam"
+  }
+]
