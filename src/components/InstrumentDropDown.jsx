@@ -1,7 +1,7 @@
-import ragaData from '../raga_details.json';
-export default function RagaDropdown({ 
-  selectedRaga, 
-  setSelectedRaga, 
+// InstrumentDropdown.jsx
+export default function InstrumentDropdown({ 
+  selectedInstrument, 
+  setSelectedInstrument, 
   dropdownOpen, 
   setDropdownOpen, 
   dropdownRef, 
@@ -9,10 +9,11 @@ export default function RagaDropdown({
   hoveredOptionIndex,
   setHoveredOptionIndex 
 }) {
-  return (
-    <div style={{ position: 'absolute', top: 20, left: 20, zIndex: 10 }}>
-      <div
+  const instruments = ["Flute", "Sitar","Violin"]; // add more as you get samples
 
+  return (
+    <div style={{ position: 'absolute', top:20, left: 600, zIndex: 10 }}>
+      <div
         ref={dropdownRef}
         onClick={() => setDropdownOpen(!dropdownOpen)}
         style={{
@@ -25,7 +26,7 @@ export default function RagaDropdown({
           minWidth: '300px'
         }}
       >
-        {selectedRaga}
+        {selectedInstrument}
       </div>
 
       {dropdownOpen && (
@@ -43,14 +44,11 @@ export default function RagaDropdown({
             marginTop: '5px'
           }}
         >
-          {ragaData.map((r, index) => {
-              console.log('rendering option', index, 'hoveredIndex:', hoveredOptionIndex);
-
-            return(
+          {instruments.map((instrument, index) => (
             <div
-              key={r.name}
+              key={instrument}
               onClick={() => {
-                setSelectedRaga(r.name);
+                setSelectedInstrument(instrument);
                 setDropdownOpen(false);
               }}
               style={{
@@ -64,10 +62,9 @@ export default function RagaDropdown({
               onMouseEnter={() => setHoveredOptionIndex(index)} // keep mouse support
               onMouseLeave={() => setHoveredOptionIndex(null)}
             >
-              {r.name}
+              {instrument}
             </div>
-        
-        )})}
+          ))}
         </div>
       )}
     </div>

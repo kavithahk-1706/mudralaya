@@ -1,6 +1,6 @@
 import { drawText } from "./canvasHelpers";
 
-export function handleSwaraInteraction({ ctx, swaraBoxes, x, y, ref }) {
+export function handleSwaraInteraction({ ctx, swaraBoxes, x, y, ref,playNote }) {
   let swara = null;
   let sthayi = null;
   let mode = null;
@@ -19,19 +19,22 @@ export function handleSwaraInteraction({ ctx, swaraBoxes, x, y, ref }) {
   }
 
   if (swara && !ref.current) {
-    drawText(ctx, `Hovered: ${swara} (${sthayi})`, 900, 150);
+    drawText(ctx, `Hovered: ${swara} (${sthayi})`, 950, 600);
     mode = 'Hover';
   }
 
   if (swara && ref.current) {
-    drawText(ctx, `Played: ${swara} (${sthayi})`, 900, 150);
+
+    drawText(ctx, `Played: ${swara} (${sthayi})`, 950, 600);
     mode = 'Played';
+    if(playNote){ playNote(swara,sthayi)
+          console.log('TRIGGERING PLAYNOTE for',swara,sthayi);
+
+    };
+
   }
 
-  console.log('after loop - swara:', swara, 'sthayi:', sthayi);
-  console.log('mouse coords:', x, y);
-  console.log('first box coords:', swaraBoxes[0]);
-  console.log('ref.current:', ref.current);
+  
 
   return {swara, sthayi, mode};
 }

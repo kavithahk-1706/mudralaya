@@ -32,9 +32,7 @@ export function drawSwaraRows(raga) {
       // check if this specific swara is the active one
       const isActive = activeInteraction?.swara === sw && activeInteraction?.sthayi === sthayi;
       const brightnessMultiplier = isActive ? (activeInteraction.mode === "Played" ? 5 : 3) : 1.0;
-      if (isActive) {
-        console.log('ACTIVE SWARA:', sw, sthayi, 'multiplier:', brightnessMultiplier, 'mode:', activeInteraction.mode);
-      }
+     
       ctx.beginPath();
       ctx.arc(x, y, circleSize, 0, 2 * Math.PI);
       ctx.fillStyle = createAndApplyGradient(ctx, x, y, circleSize, brightnessMultiplier); // pass it here
@@ -62,7 +60,7 @@ export function drawSwaraRows(raga) {
       });
     };
 
-    const swaraSpacing = 80;
+    const swaraSpacing = 85;
     const rowSpacing = 80;
 
     // Draw madhya row

@@ -10,15 +10,10 @@ import ragaData from "../raga_details.json";
 
 export default function useHandTracking({
   selectedRagaRef,
-  dropdownOpenRef,
-  setDropdownOpen,
-  setSelectedRaga,
   vidRef,
   canvasRef,
-  dropdownRef,
-  optionsRef,
-  hoveredOptionIndexRef,
-  setHoveredOptionIndex
+  playNote,
+  handleAllDropdownInteractions
 }) {
 
   const handsRef = useRef(null);
@@ -27,55 +22,10 @@ export default function useHandTracking({
   const isPinchingRef = useRef(false);
   const activeInteractionRef = useRef(null);
   const mousePosRef = useRef({ x: 0, y: 0 });
+  const prevMouseDownRef = useRef(false);
   const mouseDownRef = useRef(false);
 
-  // helper function for dropdown interaction
-  const handleDropdownInteraction = (x, y, isPinching, wasPinching) => {
-    const dropdownRect = dropdownRef.current?.getBoundingClientRect();
-    const optionsRect = optionsRef.current?.getBoundingClientRect();
-    const canvas=canvasRef.current;
-    // convert canvas coords to screen coords
-    const canvasRect = canvasRef.current?.getBoundingClientRect();
-    if (!canvasRect) return;
-    
-    const scaleX = canvasRect.width / canvas.width;
-    const scaleY = canvasRect.height / canvas.height;
-    const screenX = x * scaleX + canvasRect.left;
-    const screenY = y * scaleY + canvasRect.top;
 
-    // check hover over options
-    if (optionsRect && dropdownOpenRef.current &&
-      screenX >= optionsRect.left && screenX <= optionsRect.right &&
-      screenY >= optionsRect.top && screenY <= optionsRect.bottom) {
-      
-      const optionHeight = optionsRect.height / ragaData.length;
-      const hoveredIndex = Math.floor((screenY - optionsRect.top) / optionHeight);
-      
-      if (hoveredIndex >= 0 && hoveredIndex < ragaData.length && hoveredIndex !== hoveredOptionIndexRef.current) {
-        hoveredOptionIndexRef.current = hoveredIndex;
-        setHoveredOptionIndex(hoveredIndex);
-      }
-
-      // pinch to select
-      if (isPinching && !wasPinching) {
-        setSelectedRaga(ragaData[hoveredIndex].name);
-        setDropdownOpen(false);
-      }
-    } else {
-      // not hovering options anymore
-      if (hoveredOptionIndexRef.current !== null) {
-        hoveredOptionIndexRef.current = null;
-        setHoveredOptionIndex(null);
-      }
-    }
-
-    // pinch to open dropdown
-    if (isPinching && !wasPinching && dropdownRect && !dropdownOpenRef.current &&
-      screenX >= dropdownRect.left && screenX <= dropdownRect.right &&
-      screenY >= dropdownRect.top &&  screenY <= dropdownRect.bottom) {
-      setDropdownOpen(true);
-    }
-  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -90,6 +40,7 @@ export default function useHandTracking({
         y: (e.clientY - rect.top) * scaleY,
       };
     };
+
 
     const handleMouseDown = () => { mouseDownRef.current = true; };
     const handleMouseUp = () => { mouseDownRef.current = false; };
@@ -124,6 +75,10 @@ export default function useHandTracking({
       const ctx = canvas.getContext("2d");
       canvas.width = results.image.width;
       canvas.height = results.image.height;
+      console.log(results.image.height);
+      console.log(results.image.width);
+      console.log('canvas size:', canvas.width, canvas.height);
+
 
       ctx.save();
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -136,8 +91,14 @@ export default function useHandTracking({
       const swaraBoxes = rowDrawer ? rowDrawer(ctx, canvas.width / 3, canvas.height / 2, activeInteractionRef.current) : [];
 
       // mouse interaction
+
       const { x: mx, y: my } = mousePosRef.current;
-      let mouseInteraction = handleSwaraInteraction({ctx, swaraBoxes, x: mx, y: my, ref: mouseDownRef});
+      let mouseInteraction = handleSwaraInteraction({ctx, swaraBoxes, x: mx, y: my, ref: mouseDownRef, playNote});
+      if (handleAllDropdownInteractions) {
+          handleAllDropdownInteractions(mx, my, mouseDownRef.current, prevMouseDownRef.current);
+      } 
+        prevMouseDownRef.current = mouseDownRef.current;
+
       if (mouseInteraction.swara) activeInteractionRef.current = mouseInteraction;
       if (canvasRef.current) canvasRef.current.style.cursor = mouseInteraction.swara ? 'pointer' : 'default';
 
@@ -154,17 +115,36 @@ export default function useHandTracking({
           drawLandmarks(ctx, landmarks, { color: "#000", radius: 1 });
           
           const [distance, currentlyPinching] = usePinch(landmarks);
+          
+
           const { x, y } = flipLandmark(landmarks[8], canvas);
+
+         
+         const canvasRect = canvas.getBoundingClientRect();
+    const scaleX = canvasRect.width / canvas.width;
+    const scaleY = canvasRect.height / canvas.height;
+    const screenX = x * scaleX + canvasRect.left;
+    const screenY = y * scaleY + canvasRect.top;
+
+    
+    console.log('converted screen coords:', screenX, screenY);
+
+          
+          console.log('canvas screen rect:', canvasRect);
+
+
           
           // hand interaction with swaras
-          let handInteraction = handleSwaraInteraction({ctx, swaraBoxes, x, y, ref: isPinchingRef});
+          let handInteraction = handleSwaraInteraction({ctx, swaraBoxes, x, y, ref: isPinchingRef, playNote});
           if (handInteraction.swara) activeInteractionRef.current = handInteraction;
+          if(handleAllDropdownInteractions){
+            handleAllDropdownInteractions(x, y, currentlyPinching, isPinchingRef.current);
+
+          }
           
           drawText(ctx, `${distance.toFixed(3)} ${currentlyPinching ? "Pinch!" : "Not Pinch"} ${handType}`, 900, 100);
 
-          // dropdown interaction
-          handleDropdownInteraction(x, y, currentlyPinching, isPinchingRef.current);
-
+        
           isPinchingRef.current = currentlyPinching;
         }
       }
@@ -187,5 +167,5 @@ export default function useHandTracking({
       cameraRef.current?.stop();
       handsRef.current?.close();
     };
-  }, []);
+  }, [playNote]);
 }

@@ -1,7 +1,6 @@
-import ragaData from '../raga_details.json';
-export default function RagaDropdown({ 
-  selectedRaga, 
-  setSelectedRaga, 
+export default function BasePitchDropdown({ 
+  basePitchShift, 
+  setBasePitchShift, 
   dropdownOpen, 
   setDropdownOpen, 
   dropdownRef, 
@@ -9,10 +8,23 @@ export default function RagaDropdown({
   hoveredOptionIndex,
   setHoveredOptionIndex 
 }) {
-  return (
-    <div style={{ position: 'absolute', top: 20, left: 20, zIndex: 10 }}>
-      <div
+  const pitchOptions = [
 
+    { value: -3, label: "-3 semitones (A)" },
+    { value: -2, label: "-2 semitones (A#)" },
+    { value: -1, label: "-1 semitone (B)" },
+    { value: 0, label: "Default (C)" },
+    { value: 1, label: "+1 semitone (C#)" },
+    { value: 2, label: "+2 semitones (D)" },
+    { value: 3, label: "+3 semitones (D#)" },
+
+  ];
+
+  const currentLabel = pitchOptions.find(opt => opt.value === basePitchShift)?.label || "Default (C)";
+
+  return (
+    <div style={{ position: 'absolute', top: 20, right: 20, zIndex: 10 }}>
+      <div
         ref={dropdownRef}
         onClick={() => setDropdownOpen(!dropdownOpen)}
         style={{
@@ -25,7 +37,7 @@ export default function RagaDropdown({
           minWidth: '300px'
         }}
       >
-        {selectedRaga}
+        {currentLabel}
       </div>
 
       {dropdownOpen && (
@@ -43,14 +55,11 @@ export default function RagaDropdown({
             marginTop: '5px'
           }}
         >
-          {ragaData.map((r, index) => {
-              console.log('rendering option', index, 'hoveredIndex:', hoveredOptionIndex);
-
-            return(
+          {pitchOptions.map((option, index) => (
             <div
-              key={r.name}
+              key={option.value}
               onClick={() => {
-                setSelectedRaga(r.name);
+                setBasePitchShift(option.value);
                 setDropdownOpen(false);
               }}
               style={{
@@ -59,15 +68,14 @@ export default function RagaDropdown({
                 color: '#ccc',
                 cursor: 'pointer',
                 borderBottom: '1px solid #444',
-                backgroundColor: hoveredOptionIndex === index ? '#686868a4' : 'transparent' // use state instead
+                backgroundColor: hoveredOptionIndex === index ? '#686868a4' : 'transparent'
               }}
-              onMouseEnter={() => setHoveredOptionIndex(index)} // keep mouse support
+              onMouseEnter={() => setHoveredOptionIndex(index)}
               onMouseLeave={() => setHoveredOptionIndex(null)}
             >
-              {r.name}
+              {option.label}
             </div>
-        
-        )})}
+          ))}
         </div>
       )}
     </div>

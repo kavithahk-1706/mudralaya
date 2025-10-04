@@ -57,8 +57,8 @@
   {
     "name": "Niroshta",
     "type": "Janya (Audava)",
-    "arohana": ["S", "R2", "G2", "D2", "N3", "S"],
-    "avarohana": ["S", "N3", "D2","G2", "R2", "S"],
+    "arohana": ["S", "R2", "G3", "D2", "N3", "S"],
+    "avarohana": ["S", "N3", "D2","G3", "R2", "S"],
     "parent": "Shankarabharanam"
   }
 ]
