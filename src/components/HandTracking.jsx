@@ -7,7 +7,6 @@ import InstrumentDropdown from "./InstrumentDropDown";
 import BasePitchDropdown from "./BasePitchDropdown";
 
 
-
 export default function HandTracking() {
   const [selectedRaga, setSelectedRaga] = useState(ragaData[0].name);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -19,6 +18,7 @@ export default function HandTracking() {
   const [instrumentDropdownOpen, setInstrumentDropdownOpen] = useState(false);
   const [pitchDropdownOpen, setPitchDropdownOpen] = useState(false);
 
+  const lastPlayedSwaraRef = useRef(null); // {swara, sthayi}
   const instrumentDropdownRef = useRef(null);
   const instrumentOptionsRef = useRef(null);
   const instrumentDropdownOpenRef=useRef(null);
@@ -36,6 +36,8 @@ export default function HandTracking() {
   const ragaHoveredIndexRef = useRef(null);
   const instrumentHoveredIndexRef = useRef(null);
   const pitchHoveredIndexRef = useRef(null);
+  
+
 
   const [ragaHoveredIndex, setRagaHoveredIndex] = useState(null);
   const [instrumentHoveredIndex, setInstrumentHoveredIndex] = useState(null);
@@ -53,9 +55,7 @@ export default function HandTracking() {
     const screenY = y * scaleY + canvasRect.top;
 
     
-    console.log('converted screen coords:', screenX, screenY);
-    console.log('dropdown rect:', dropdownRef.current?.getBoundingClientRect());
-
+  
 
     const checkDropdown = (dropdownRef, optionsRef, isOpen, setOpen, options, setHovered, onSelect, hoveredIndexRef) => {
       const dropdownRect = dropdownRef.current?.getBoundingClientRect();
@@ -176,7 +176,7 @@ export default function HandTracking() {
         dropdownRef={instrumentDropdownRef}
         optionsRef={instrumentOptionsRef}
         hoveredOptionIndex={instrumentHoveredIndex}     
-        setHoveredOptionIndex={setRagaHoveredIndex}
+        setHoveredOptionIndex={setInstrumentHoveredIndex}
       />
 
       <BasePitchDropdown
@@ -187,7 +187,7 @@ export default function HandTracking() {
         dropdownRef={pitchDropdownRef}
         optionsRef={pitchOptionsRef}
         hoveredOptionIndex={pitchHoveredIndex}
-        setHoveredOptionIndex={setInstrumentHoveredIndex}
+        setHoveredOptionIndex={setPitchHoveredIndex}
     />
 
       <RagaDropdown
@@ -198,7 +198,7 @@ export default function HandTracking() {
         dropdownRef={dropdownRef}
         optionsRef={optionsRef}
         hoveredOptionIndex={ragaHoveredIndex}     
-        setHoveredOptionIndex={setPitchHoveredIndex}
+        setHoveredOptionIndex={setRagaHoveredIndex}
       />
     </div>
   )

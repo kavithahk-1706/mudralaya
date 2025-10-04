@@ -10,7 +10,7 @@ export default function useTonePlayer(selectedInstrument="Flute", basePitchShift
     const prevInstrumentRef = useRef(null);
 
     const instrumentSamples = {
-      Flute: {"C5": "/assets/Flute_1_C.wav" },
+      Flute: {"C4": "/assets/Flute_1_C.mp3" },
       Sitar: { "C4": "/assets/Sitar_1_C.wav" },
       Violin: {"G4":"/assets/Violin_1_G.wav"}
     };
@@ -92,9 +92,9 @@ function getSwaraNote(swara, sthayi, basePitchShift = 0) {
   };
 
   const octaveMap = {
-    "Mandra Sthayi": 3,
-    "Madhya Sthayi": 4,
-    "Tara Sthayi": 5
+    "mandra": 3,
+    "madhyai": 4,
+    "tara": 5
   };
 
   const semitone = swaraMap[swara] ?? 0;

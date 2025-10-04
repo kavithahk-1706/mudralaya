@@ -1,9 +1,11 @@
 import { drawText } from "./canvasHelpers";
 
+
 export function handleSwaraInteraction({ ctx, swaraBoxes, x, y, ref,playNote }) {
   let swara = null;
   let sthayi = null;
   let mode = null;
+  let isReachable=true;
 
   for (const box of swaraBoxes) {
     if (
@@ -14,16 +16,18 @@ export function handleSwaraInteraction({ ctx, swaraBoxes, x, y, ref,playNote }) 
     ) {
       swara = box.swara;
       sthayi = box.sthayi;
+      isReachable=box.isReachable;
       break;
     }
   }
 
   if (swara && !ref.current) {
-    drawText(ctx, `Hovered: ${swara} (${sthayi})`, 950, 600);
+    const status=isReachable?"Hovered":"Not Allowed";
+    drawText(ctx, `${status}: ${swara} (${sthayi})`, 950, 600);
     mode = 'Hover';
   }
 
-  if (swara && ref.current) {
+  if (swara && ref.current && isReachable) {
 
     drawText(ctx, `Played: ${swara} (${sthayi})`, 950, 600);
     mode = 'Played';

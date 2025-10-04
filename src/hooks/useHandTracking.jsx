@@ -24,6 +24,7 @@ export default function useHandTracking({
   const mousePosRef = useRef({ x: 0, y: 0 });
   const prevMouseDownRef = useRef(false);
   const mouseDownRef = useRef(false);
+  const currentSwaraRef=useRef(null);
 
 
 
@@ -75,9 +76,7 @@ export default function useHandTracking({
       const ctx = canvas.getContext("2d");
       canvas.width = results.image.width;
       canvas.height = results.image.height;
-      console.log(results.image.height);
-      console.log(results.image.width);
-      console.log('canvas size:', canvas.width, canvas.height);
+
 
 
       ctx.save();
@@ -87,20 +86,30 @@ export default function useHandTracking({
       ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
       ctx.restore();
 
-      const rowDrawer = drawSwaraRows(ragaData.find(r => r.name === selectedRagaRef.current));
+      const rowDrawer = drawSwaraRows(
+        ragaData.find(r => r.name === selectedRagaRef.current),
+        currentSwaraRef.current
+      );
       const swaraBoxes = rowDrawer ? rowDrawer(ctx, canvas.width / 3, canvas.height / 2, activeInteractionRef.current) : [];
 
       // mouse interaction
 
       const { x: mx, y: my } = mousePosRef.current;
       let mouseInteraction = handleSwaraInteraction({ctx, swaraBoxes, x: mx, y: my, ref: mouseDownRef, playNote});
+      if (mouseInteraction.swara && mouseInteraction.mode==="Played"){ 
+        currentSwaraRef.current={
+          swara:mouseInteraction.swara,
+          sthayi:mouseInteraction.sthayi
+        }
+        activeInteractionRef.current = mouseInteraction;
+      }
+      if (canvasRef.current) canvasRef.current.style.cursor = mouseInteraction.swara ? 'pointer' : 'default';
+
+
       if (handleAllDropdownInteractions) {
           handleAllDropdownInteractions(mx, my, mouseDownRef.current, prevMouseDownRef.current);
       } 
         prevMouseDownRef.current = mouseDownRef.current;
-
-      if (mouseInteraction.swara) activeInteractionRef.current = mouseInteraction;
-      if (canvasRef.current) canvasRef.current.style.cursor = mouseInteraction.swara ? 'pointer' : 'default';
 
       ctx.save();
       ctx.translate(canvas.width, 0);
@@ -120,23 +129,27 @@ export default function useHandTracking({
           const { x, y } = flipLandmark(landmarks[8], canvas);
 
          
-         const canvasRect = canvas.getBoundingClientRect();
-    const scaleX = canvasRect.width / canvas.width;
-    const scaleY = canvasRect.height / canvas.height;
-    const screenX = x * scaleX + canvasRect.left;
-    const screenY = y * scaleY + canvasRect.top;
+          const canvasRect = canvas.getBoundingClientRect();
+          const scaleX = canvasRect.width / canvas.width;
+          const scaleY = canvasRect.height / canvas.height;
+          const screenX = x * scaleX + canvasRect.left;
+          const screenY = y * scaleY + canvasRect.top;
 
-    
-    console.log('converted screen coords:', screenX, screenY);
 
-          
-          console.log('canvas screen rect:', canvasRect);
+
+
 
 
           
           // hand interaction with swaras
           let handInteraction = handleSwaraInteraction({ctx, swaraBoxes, x, y, ref: isPinchingRef, playNote});
-          if (handInteraction.swara) activeInteractionRef.current = handInteraction;
+          if (handInteraction.swara && handInteraction.mode==="Played") {
+            currentSwaraRef.current={
+              swara:handInteraction.swara,
+              sthayi:handInteraction.sthayi
+            }
+            activeInteractionRef.current = handInteraction;
+          }
           if(handleAllDropdownInteractions){
             handleAllDropdownInteractions(x, y, currentlyPinching, isPinchingRef.current);
 
