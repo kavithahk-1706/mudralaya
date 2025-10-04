@@ -54,8 +54,8 @@ export default function RagaDropdown({
                 setDropdownOpen(false);
               }}
               style={{
-                padding: '10px',
-                fontSize: '25px',
+                padding: '8px',
+                fontSize: '20px',
                 color: '#ccc',
                 cursor: 'pointer',
                 borderBottom: '1px solid #444',

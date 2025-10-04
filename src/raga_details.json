@@ -20,6 +20,12 @@
     "avarohana": ["S", "N3", "D2", "P", "M2", "G3", "R2", "S"]
   },
   {
+    "name":"Harikambhoji",
+    "type":"Melakarta",
+    "arohana":["S","R2","G3","M1","P","D2","N2","S"],
+    "avarohana":["S","N2","D2","P","M1","G3","R2","S"]
+  },
+  {
     "name": "Mohana",
     "type": "Janya (Audava)",
     "arohana": ["S", "R2", "G3", "P", "D2", "S"],
