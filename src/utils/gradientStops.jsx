@@ -26,25 +26,35 @@ export default function generateMistyGradientStops(brightnessMultiplier = 1.0) {
   const gradientStops = [
     {
       offset: "0%",
-      color: adjustColor("hsla(176, 70%, 45%, 0.92)", brightnessMultiplier), // deep teal
+      color: adjustColor("hsla(275, 65%, 52%, 0.88)", brightnessMultiplier), // deep teal
       opacity: 1
     },
     {
       offset: "30%",
-      color: adjustColor("hsla(165, 75%, 50%, 0.95)", brightnessMultiplier), // emerald-teal
+      color: adjustColor("hsla(200, 80%, 48%, 0.93)", brightnessMultiplier), // emerald-teal
       opacity: 1
     },
     {
       offset: "65%",
-      color: adjustColor("hsla(200, 80%, 48%, 0.93)", brightnessMultiplier), // peacock blue
+      color: adjustColor("hsla(165, 75%, 50%, 0.95)", brightnessMultiplier), // peacock blue
       opacity: 1
     },
     {
       offset: "100%",
-      color: adjustColor("hsla(275, 65%, 52%, 0.88)", brightnessMultiplier), // blue with purple undertone
+      color: adjustColor("hsla(176, 74%, 71%, 0.92)", brightnessMultiplier), // blue with purple undertone
       opacity: 1
     }
   ];
 
   return gradientStops;
 };
+
+/*
+hsla(275, 65%, 52%, 0.88)
+
+hsla(165, 75%, 50%, 0.95)
+hsla(176, 74%, 71%, 0.92)
+
+
+*/ 
+

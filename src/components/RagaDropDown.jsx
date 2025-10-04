@@ -18,8 +18,8 @@ export default function RagaDropdown({
         style={{
           padding: '10px',
           fontSize: '30px',
-          color: '#333',
-          background: `linear-gradient(45deg,hsla(185, 100%, 85%, 0.63), hsla(165, 75%, 50%, 0.82),hsla(200, 80%, 48%, 0.85),hsla(275, 65%, 52%, 0.74))`,
+          color: '#fff',
+          background: `linear-gradient(45deg, hsla(275, 65%, 52%, 0.9), hsla(165, 75%, 50%, 0.9))`,
           borderRadius: '10px',
           cursor: 'pointer',
           minWidth: '300px'

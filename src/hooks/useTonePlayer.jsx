@@ -10,8 +10,8 @@ export default function useTonePlayer(selectedInstrument="Flute", basePitchShift
     const prevInstrumentRef = useRef(null);
 
     const instrumentSamples = {
-      Flute: {"C4": "/assets/Flute_1_C.mp3" },
       Sitar: { "C4": "/assets/Sitar_1_C.wav" },
+      Flute: {"C4": "/assets/Flute_1_C.mp3" },
       Violin: {"G4":"/assets/Violin_1_G.wav"}
     };
    

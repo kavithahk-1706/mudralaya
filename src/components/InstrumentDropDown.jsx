@@ -9,18 +9,19 @@ export default function InstrumentDropdown({
   hoveredOptionIndex,
   setHoveredOptionIndex 
 }) {
-  const instruments = ["Flute", "Sitar","Violin"]; // add more as you get samples
+  const instruments = ["Sitar","Flute","Violin"]; // add more as you get samples
 
   return (
-    <div style={{ position: 'absolute', top:20, left: 600, zIndex: 10 }}>
+    <div style={{ position: 'absolute', top:20, left: 625, zIndex: 10 }}>
       <div
         ref={dropdownRef}
         onClick={() => setDropdownOpen(!dropdownOpen)}
         style={{
           padding: '10px',
           fontSize: '30px',
-          color: '#333',
-          background: `linear-gradient(45deg,hsla(185, 100%, 85%, 0.63), hsla(165, 75%, 50%, 0.82),hsla(200, 80%, 48%, 0.85),hsla(275, 65%, 52%, 0.74))`,
+          color: '#fff',
+          textAlign:'center',
+          background: `linear-gradient(45deg, hsla(275, 65%, 52%, 0.9), hsla(165, 75%, 50%, 0.9))`,
           borderRadius: '10px',
           cursor: 'pointer',
           minWidth: '300px'

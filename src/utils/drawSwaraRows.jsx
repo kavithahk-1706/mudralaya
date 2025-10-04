@@ -47,7 +47,7 @@ export function drawSwaraRows(raga,currentSwara = null) {
         ctx.strokeStyle = "rgba(150, 150, 150, 0.5)";
       } else {
         ctx.fillStyle = createAndApplyGradient(ctx, x, y, circleSize, brightnessMultiplier);
-        ctx.strokeStyle = "#caedfaff";
+        ctx.strokeStyle = "#84d1edff";
       }
 
       ctx.lineWidth = 1;

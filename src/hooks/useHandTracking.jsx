@@ -155,7 +155,7 @@ export default function useHandTracking({
 
           }
           
-          drawText(ctx, `${distance.toFixed(3)} ${currentlyPinching ? "Pinch!" : "Not Pinch"} ${handType}`, 900, 100);
+          
 
         
           isPinchingRef.current = currentlyPinching;

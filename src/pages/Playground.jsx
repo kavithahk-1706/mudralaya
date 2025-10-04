@@ -1,16 +1,31 @@
 import { useEffect, useRef, useState } from "react";
 import useHandTracking from "../hooks/useHandTracking";
-import RagaDropdown from "./RagaDropDown";
+import RagaDropdown from "../components/RagaDropDown";
 import ragaData from "../raga_details.json";
 import useTonePlayer from "../hooks/useTonePlayer";
-import InstrumentDropdown from "./InstrumentDropDown";
-import BasePitchDropdown from "./BasePitchDropdown";
+import InstrumentDropdown from "../components/InstrumentDropDown";
+import BasePitchDropdown from "../components/BasePitchDropdown";
+import { Link } from "react-router-dom";
 
 
-export default function HandTracking() {
+
+export default function Playground({ isAuthenticated }) {
+
+  const [isRecording, setIsRecording] = useState(false);
+
+  const handleRecord = () => {
+    if (!isAuthenticated) {
+      // redirect to login
+      window.location.href = '/login';
+      return;
+    }
+    // start recording logic
+    setIsRecording(true);
+  };
+
   const [selectedRaga, setSelectedRaga] = useState(ragaData[0].name);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [selectedInstrument, setSelectedInstrument] = useState("Flute");
+  const [selectedInstrument, setSelectedInstrument] = useState("Sitar");
   const [basePitchShift, setBasePitchShift] = useState(0);
 
   const playNote = useTonePlayer(selectedInstrument, basePitchShift);
@@ -206,6 +221,57 @@ export default function HandTracking() {
         hoveredOptionIndex={ragaHoveredIndex}     
         setHoveredOptionIndex={setRagaHoveredIndex}
       />
+
+      <Link to="/">
+      <button style={{
+          position: 'absolute',
+          top:600,
+          left: 25,
+          padding: '8px',
+          fontSize: '25px',
+          color: '#ffffffff',
+          background: `linear-gradient(45deg, hsla(275, 65%, 52%, 0.9), hsla(165, 75%, 50%, 0.9))`,
+          borderRadius: '10px',
+          border:'none',
+          cursor: 'pointer',
+          minWidth: '250px'
+        }}
+          
+          onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+          onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+          >
+
+            Back to Home
+            
+        </button>
+      </Link>
+
+      <Link to="/login">
+      <button style={{
+          position: 'absolute',
+          top:600,
+          right: 25,
+          padding: '8px',
+          fontSize: '25px',
+          color: '#ffffffff',
+          border:'none',
+          background: `linear-gradient(45deg,hsla(0, 97%, 12%, 0.82), hsla(0, 82%, 30%, 0.82),hsla(0, 80%, 48%, 0.85),hsla(0, 93%, 64%, 0.74))`,
+          borderRadius: '10px',
+          cursor: 'pointer',
+          minWidth: '250px'
+        }}
+          
+          onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+          onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+          >
+
+                {isAuthenticated ? (isRecording ? 'Stop Recording' : 'Record Session') : 'Login to Record'}
+            
+        </button>
+      </Link>
+      
+
+    
     </div>
   )
 }

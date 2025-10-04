@@ -23,13 +23,13 @@ export function handleSwaraInteraction({ ctx, swaraBoxes, x, y, ref,playNote }) 
 
   if (swara && !ref.current) {
     const status=isReachable?"Hovered":"Not Allowed";
-    drawText(ctx, `${status}: ${swara} (${sthayi})`, 950, 600);
+    drawText(ctx, `${status}: ${swara} (${sthayi})`, 525, 200);
     mode = 'Hover';
   }
 
   if (swara && ref.current && isReachable) {
 
-    drawText(ctx, `Played: ${swara} (${sthayi})`, 950, 600);
+    drawText(ctx, `Played: ${swara} (${sthayi})`, 525, 200);
     mode = 'Played';
     if(playNote){ playNote(swara,sthayi)
           console.log('TRIGGERING PLAYNOTE for',swara,sthayi);
