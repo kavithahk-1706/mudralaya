@@ -44,7 +44,7 @@ export default function RagaDropdown({
           }}
         >
           {ragaData.map((r, index) => {
-              console.log('rendering option', index, 'hoveredIndex:', hoveredOptionIndex);
+            
 
             return(
             <div

@@ -11,7 +11,7 @@ export default function useRecording() {
   const timerRef = useRef(null);
 
   const startRecording = () => {
-    console.log('START RECORDING CALLED');
+
     isRecordingRef.current = true;
     setIsRecordingState(true);
     recordingData.current = [];
@@ -24,7 +24,6 @@ export default function useRecording() {
   };
 
   const recordSwara = (swara, sthayi) => {
-    console.log('recordSwara called, isRecordingRef.current:', isRecordingRef.current);
     if (!isRecordingRef.current) return;
     
     recordingData.current.push({ 
@@ -32,7 +31,6 @@ export default function useRecording() {
       sthayi, 
       timestamp: Date.now() - startTimeRef.current
     });
-    console.log('added, length:', recordingData.current.length);
   };
 
   const stopRecording = async (ragaName, instrument) => {
@@ -46,7 +44,6 @@ export default function useRecording() {
     }
 
     if (recordingData.current.length === 0) {
-      console.log('no notes recorded');
       return;
     }
 
@@ -60,7 +57,6 @@ export default function useRecording() {
       timestamp: Date.now()
     });
 
-    console.log('recording saved');
     setDuration(0);
   };
 

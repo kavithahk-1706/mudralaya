@@ -139,7 +139,7 @@ export default function Playground({
       setInstrumentHoveredIndex,
       (instrument) => {
         setSelectedInstrument(instrument);   
-        console.log('SWITCHING INSTRUMENT TO:', instrument);
+        
       },
       instrumentHoveredIndexRef
     );

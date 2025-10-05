@@ -47,7 +47,6 @@ export default function useTonePlayer(selectedInstrument, basePitchShift = 0) {
         urls: instrumentSamples[selectedInstrument],
         baseUrl: "",
         onload: () => {
-          console.log(`${selectedInstrument} sampler loaded`);
 
           samplerLoadedRef.current = true;
         },
@@ -65,14 +64,12 @@ export default function useTonePlayer(selectedInstrument, basePitchShift = 0) {
 
     const playNote = useCallback(async (swara, sthayi) => {
       if (!samplerRef.current || !samplerLoadedRef.current) {
-        console.log("Sampler not ready yet");
         return;
       }
 
       if (!toneStartedRef.current) {
-        await Tone.start(); // WAIT for this to finish
+        await Tone.start(); 
         toneStartedRef.current = true;
-        console.log("Tone.js started");
       }
 
       const note = getSwaraNote(swara, sthayi, basePitchShift);

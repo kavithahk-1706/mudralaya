@@ -23,19 +23,12 @@ export function handleSwaraInteraction({ ctx, swaraBoxes, x, y, ref, prevRef, pl
 
   // EDGE TRIGGER: only on transition from not-pinching to pinching
   if (swara && ref.current && !prevRef.current && isReachable) {
-    console.log('ABOUT TO RECORD:', swara, sthayi);
+  
     drawText(ctx, `Played: ${swara} (${sthayi})`, 525, 200);
     mode = 'Played';
     if (playNote) playNote(swara, sthayi);
     if (recordSwara){ 
       recordSwara(swara, sthayi)
-        if (recordSwara) {
-        console.log('recordSwara is defined, calling it');
-
-        }else{
-          console.log('recordSwara is undefined!');
-        }
-
     };
   }
 
