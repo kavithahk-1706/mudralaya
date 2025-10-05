@@ -40,10 +40,10 @@ export default function Navbar() {
 
         {/* Nav Links */}
         <div className="flex items-center gap-8">
-          <a href="#home" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">
+          <a href="/#home" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">
             Home
           </a>
-          <a href="#whats-included" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">
+          <a href="/#whats-included" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">
             What's Included
           </a>
           <Link to="/playground" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">
