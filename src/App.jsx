@@ -1,25 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { auth } from './firebase';
 import Home from './pages/Home';
-import Login from './pages/Login';
 import Playground from './pages/Playground';
 import Recordings from './pages/Recordings';
+import Navbar from './components/NavBar';
+import useTonePlayer from './hooks/useTonePlayer';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+  const [selectedInstrument, setSelectedInstrument] = useState("Sitar");
+  const [basePitchShift, setBasePitchShift]=useState(0);
+
+  const playNote = useTonePlayer(selectedInstrument, 0);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(setUser);
+    return unsubscribe;
+  }, []);
 
   return (
     <BrowserRouter>
+  
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
-        <Route 
-          path="/playground" 
-          element={<Playground isAuthenticated={isAuthenticated} />} 
-        />
+        <Route path="/playground" element={<Playground 
+              user={user}
+              selectedInstrument={selectedInstrument}
+              setSelectedInstrument={setSelectedInstrument}
+              basePitchShift={basePitchShift}
+              setBasePitchShift={setBasePitchShift}
+            />} />
         <Route 
           path="/recordings" 
-          element={isAuthenticated ? <Recordings /> : <Navigate to="/login" />} 
+          element={user ? <Recordings playNote={playNote} /> : <Navigate to="/" />} 
         />
       </Routes>
     </BrowserRouter>

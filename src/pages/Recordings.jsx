@@ -1,5 +1,121 @@
-export default function Recordings(){
-    return(
-        <h1>Recordings</h1>
-    )
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ref, onValue, remove } from 'firebase/database'; // add remove
+import { db, auth } from '../firebase';
+import Navbar from '../components/NavBar';
+
+export default function Recordings({ playNote }) {
+  const [recordings, setRecordings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!auth.currentUser) {
+      navigate('/');
+      return;
+    }
+
+    const recordingsRef = ref(db, `recordings/${auth.currentUser.uid}`);
+    
+    const unsubscribe = onValue(recordingsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const recordingsArray = Object.entries(data).map(([id, recording]) => ({
+          id,
+          ...recording
+        }));
+        recordingsArray.sort((a, b) => b.timestamp - a.timestamp);
+        setRecordings(recordingsArray);
+      } else {
+        setRecordings([]);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [navigate]);
+
+  const playback = async (notes) => {
+    if (!notes || notes.length === 0) return;
+    
+    for (const note of notes) {
+      setTimeout(() => {
+        playNote(note.swara, note.sthayi);
+      }, note.timestamp);
+    }
+  };
+
+  const deleteRecording = async (id) => {
+    if (!confirm('Delete this recording?')) return;
+    
+    const recordingRef = ref(db, `recordings/${auth.currentUser.uid}/${id}`);
+    await remove(recordingRef);
+  };
+
+  return (
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-gradient-to-br from-purple-500/90 via-cyan-500/95 to-teal-400/90 p-12 pt-28">
+        <div className="max-w-5xl mx-auto bg-white/95 rounded-2xl shadow-2xl p-12">
+          
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-4xl font-bold bg-gradient-to-r p-3 from-purple-600 to-teal-500 bg-clip-text text-transparent">
+              Your Recordings
+            </h1>
+          </div>
+          
+          {recordings.length === 0 ? (
+            <div className="text-center py-20 text-gray-600">
+              <p className="text-xl mb-2">No recordings yet</p>
+              <p>Start recording in the playground to save your sessions.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {recordings.map(recording => (
+                <div 
+                  key={recording.id} 
+                  className="p-5 bg-gray-50 rounded-xl border border-gray-200 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-800 mb-2">
+                        {recording.raga}
+                      </h3>
+                      <p className="text-sm text-gray-500 mb-1">
+                        {new Date(recording.timestamp).toLocaleString()}
+                      </p>
+                      <p className="text-sm text-gray-600 mb-1">
+                        {recording.notes?.length || 0} notes • {recording.instrument || 'Unknown instrument'}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => playback(recording.notes)}
+                        className="px-5 py-2 bg-gradient-to-r from-teal-500/90 to-cyan-500/90 text-white rounded-lg font-semibold hover:shadow-md transition-all duration-200"
+                      >
+                        Play
+                      </button>
+                      <button 
+                        onClick={() => deleteRecording(recording.id)}
+                        className="px-5 py-2 bg-gradient-to-r from-red-500/90 to-red-600/90 text-white rounded-lg font-semibold hover:shadow-md transition-all duration-200"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="mt-8">
+            <Link to="/playground" className="flex justify-center">
+              <button className="px-6 py-3 bg-gradient-to-r from-purple-600/90 to-teal-500/90 text-white rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200">
+                Go to Playground
+              </button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }

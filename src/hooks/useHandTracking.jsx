@@ -13,6 +13,7 @@ export default function useHandTracking({
   vidRef,
   canvasRef,
   playNote,
+  recordSwara,
   handleAllDropdownInteractions
 }) {
 
@@ -25,6 +26,8 @@ export default function useHandTracking({
   const prevMouseDownRef = useRef(false);
   const mouseDownRef = useRef(false);
   const currentSwaraRef=useRef(null);
+  const prevIsPinchingRef = useRef(false);
+
 
 
 
@@ -95,7 +98,7 @@ export default function useHandTracking({
       // mouse interaction
 
       const { x: mx, y: my } = mousePosRef.current;
-      let mouseInteraction = handleSwaraInteraction({ctx, swaraBoxes, x: mx, y: my, ref: mouseDownRef, playNote});
+      let mouseInteraction = handleSwaraInteraction({ctx, swaraBoxes, x: mx, y: my, ref: mouseDownRef, prevRef: prevMouseDownRef, playNote, recordSwara});
       if (mouseInteraction.swara && mouseInteraction.mode==="Played"){ 
         currentSwaraRef.current={
           swara:mouseInteraction.swara,
@@ -142,7 +145,7 @@ export default function useHandTracking({
 
           
           // hand interaction with swaras
-          let handInteraction = handleSwaraInteraction({ctx, swaraBoxes, x, y, ref: isPinchingRef, playNote});
+          let handInteraction = handleSwaraInteraction({ctx, swaraBoxes, x, y, ref: isPinchingRef, prevRef: prevIsPinchingRef, playNote, recordSwara});
           if (handInteraction.swara && handInteraction.mode==="Played") {
             currentSwaraRef.current={
               swara:handInteraction.swara,

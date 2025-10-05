@@ -1,7 +1,7 @@
 import { useRef, useEffect, useCallback } from "react";
 import * as Tone from "tone";
 
-export default function useTonePlayer(selectedInstrument="Flute", basePitchShift = 0) {
+export default function useTonePlayer(selectedInstrument, basePitchShift = 0) {
     const samplerRef = useRef(null);
     const reverbRef = useRef(null);
     const delayRef = useRef(null);
@@ -93,7 +93,7 @@ function getSwaraNote(swara, sthayi, basePitchShift = 0) {
 
   const octaveMap = {
     "mandra": 3,
-    "madhyai": 4,
+    "madhya": 4,
     "tara": 5
   };
 

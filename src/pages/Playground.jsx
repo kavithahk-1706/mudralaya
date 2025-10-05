@@ -8,25 +8,31 @@ import BasePitchDropdown from "../components/BasePitchDropdown";
 import { Link } from "react-router-dom";
 
 
+import useRecording from "../hooks/useRecording";
+import RecordButton from "../components/RecordButton";
 
-export default function Playground({ isAuthenticated }) {
+export default function Playground({
+  user,
+  selectedInstrument, 
+  setSelectedInstrument,
+  basePitchShift,
+  setBasePitchShift
+}) {
 
-  const [isRecording, setIsRecording] = useState(false);
+  const homeButtonRef = useRef(null);
+  const recordingsButtonRef = useRef(null);
 
-  const handleRecord = () => {
-    if (!isAuthenticated) {
-      // redirect to login
-      window.location.href = '/login';
-      return;
-    }
-    // start recording logic
-    setIsRecording(true);
-  };
 
   const [selectedRaga, setSelectedRaga] = useState(ragaData[0].name);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [selectedInstrument, setSelectedInstrument] = useState("Sitar");
-  const [basePitchShift, setBasePitchShift] = useState(0);
+
+  
+  const { isRecording, duration, startRecording, recordSwara, stopRecording } = useRecording();
+    const formatDuration = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const playNote = useTonePlayer(selectedInstrument, basePitchShift);
 
@@ -131,7 +137,10 @@ export default function Playground({ isAuthenticated }) {
       setInstrumentDropdownOpen,
       ["Flute", "Sitar", "Violin"],
       setInstrumentHoveredIndex,
-      (instrument) => setSelectedInstrument(instrument),
+      (instrument) => {
+        setSelectedInstrument(instrument);   
+        console.log('SWITCHING INSTRUMENT TO:', instrument);
+      },
       instrumentHoveredIndexRef
     );
 
@@ -163,6 +172,7 @@ export default function Playground({ isAuthenticated }) {
       (option) => setBasePitchShift(option.value),
       pitchHoveredIndexRef
     );
+ 
   };
 
 
@@ -180,6 +190,7 @@ export default function Playground({ isAuthenticated }) {
     vidRef,
     canvasRef,
     playNote,
+    recordSwara,
     handleAllDropdownInteractions 
   });
 
@@ -222,10 +233,12 @@ export default function Playground({ isAuthenticated }) {
         setHoveredOptionIndex={setRagaHoveredIndex}
       />
 
+      <div className="flex">
+
       <Link to="/">
-      <button style={{
+      <button ref={homeButtonRef} style={{
           position: 'absolute',
-          top:600,
+          top:575,
           left: 25,
           padding: '8px',
           fontSize: '25px',
@@ -246,29 +259,55 @@ export default function Playground({ isAuthenticated }) {
         </button>
       </Link>
 
-      <Link to="/login">
-      <button style={{
+      <Link to="/recordings">
+        <button ref={recordingsButtonRef} style={{
           position: 'absolute',
-          top:600,
-          right: 25,
+          top: 575,
+          left: 650,
           padding: '8px',
           fontSize: '25px',
           color: '#ffffffff',
-          border:'none',
-          background: `linear-gradient(45deg,hsla(0, 97%, 12%, 0.82), hsla(0, 82%, 30%, 0.82),hsla(0, 80%, 48%, 0.85),hsla(0, 93%, 64%, 0.74))`,
+          background: `linear-gradient(45deg, hsla(275, 65%, 52%, 0.9), hsla(165, 75%, 50%, 0.9))`,
           borderRadius: '10px',
+          border: 'none',
           cursor: 'pointer',
           minWidth: '250px'
         }}
-          
-          onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-          onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-          >
-
-                {isAuthenticated ? (isRecording ? 'Stop Recording' : 'Record Session') : 'Login to Record'}
-            
+        onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+        >
+          View Recordings
         </button>
-      </Link>
+      </Link>      
+
+  
+      <div onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'} onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}>
+         <RecordButton 
+              isRecording={isRecording}
+              onStartRecording={() => startRecording()}
+              onStopRecording={() => stopRecording(selectedRaga, selectedInstrument)}
+          
+          />
+        {isRecording && (
+          <div style={{
+            position: 'absolute',
+            bottom: 50,
+            right: 30,
+            color: 'white',
+            fontSize: '24px',
+            fontWeight: '600',
+            textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
+          }}>
+            {formatDuration(duration)}
+            
+          </div>
+        )}   
+
+
+        </div>
+    
+      </div>
+   
       
 
     
