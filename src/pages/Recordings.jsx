@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ref, onValue, remove } from 'firebase/database'; // add remove
 import { db, auth } from '../firebase';
@@ -6,7 +6,12 @@ import Navbar from '../components/NavBar';
 
 export default function Recordings({ playNote }) {
   const [recordings, setRecordings] = useState([]);
+  const [isPlaying,setIsPlaying]=useState(false);
   const [loading, setLoading] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+  const startTimeRef = useRef(null);
+  const timeoutsRef = useRef([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,13 +40,52 @@ export default function Recordings({ playNote }) {
     return () => unsubscribe();
   }, [navigate]);
 
-  const playback = async (notes) => {
+  const playback = (notes) => {
     if (!notes || notes.length === 0) return;
-    
-    for (const note of notes) {
-      setTimeout(() => {
-        playNote(note.swara, note.sthayi);
-      }, note.timestamp);
+
+    if (!isPlaying) {
+      setIsPlaying(true);
+      setIsPaused(false);
+      startTimeRef.current = performance.now() - elapsed;
+      timeoutsRef.current = [];
+
+      const scheduleNotes = () => {
+        const now = performance.now();
+        const elapsedTime = now - startTimeRef.current;
+
+        notes.forEach(note => {
+          const delay = note.timestamp - elapsedTime;
+          if (delay >= 0) {
+            const id = setTimeout(() => {
+              playNote(note.swara, note.sthayi);
+            }, delay);
+            timeoutsRef.current.push(id);
+          }
+        });
+      };
+
+      scheduleNotes();
+    } else if (!isPaused) {
+      // pause
+      const now = performance.now();
+      setElapsed(now - startTimeRef.current);
+      timeoutsRef.current.forEach(id => clearTimeout(id));
+      setIsPaused(true);
+    } else {
+      // resume
+      setIsPaused(false);
+      startTimeRef.current = performance.now() - elapsed;
+      timeoutsRef.current = [];
+
+      notes.forEach(note => {
+        const delay = note.timestamp - elapsed;
+        if (delay >= 0) {
+          const id = setTimeout(() => {
+            playNote(note.swara, note.sthayi);
+          }, delay);
+          timeoutsRef.current.push(id);
+        }
+      });
     }
   };
 
@@ -85,7 +129,7 @@ export default function Recordings({ playNote }) {
                         {new Date(recording.timestamp).toLocaleString()}
                       </p>
                       <p className="text-sm text-gray-600 mb-1">
-                        {recording.notes?.length || 0} notes • {recording.instrument || 'Unknown instrument'}
+                        {recording.notes?.length || 0} notes • {recording.selectedInstrument || 'Unknown instrument'}
                       </p>
                     </div>
                     <div className="flex gap-2">
@@ -93,7 +137,7 @@ export default function Recordings({ playNote }) {
                         onClick={() => playback(recording.notes)}
                         className="px-5 py-2 bg-gradient-to-r from-teal-500/90 to-cyan-500/90 text-white rounded-lg font-semibold hover:shadow-md transition-all duration-200"
                       >
-                        Play
+                        {!isPlaying?"Play":isPaused?"Resume":"Pause"}
                       </button>
                       <button 
                         onClick={() => deleteRecording(recording.id)}

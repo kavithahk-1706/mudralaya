@@ -33,7 +33,7 @@ export default function useRecording() {
     });
   };
 
-  const stopRecording = async (ragaName, instrument) => {
+  const stopRecording = async (ragaName, selectedInstrument, basePitchShift) => {
     isRecordingRef.current = false;
     setIsRecordingState(false);
     clearInterval(timerRef.current);
@@ -52,7 +52,8 @@ export default function useRecording() {
     
     await set(newRecording, {
       raga: ragaName,
-      instrument: instrument, // add this
+      selectedInstrument:selectedInstrument, 
+      basePitchShift:basePitchShift,
       notes: recordingData.current,
       timestamp: Date.now()
     });

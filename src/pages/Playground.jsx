@@ -285,7 +285,7 @@ export default function Playground({
          <RecordButton 
               isRecording={isRecording}
               onStartRecording={() => startRecording()}
-              onStopRecording={() => stopRecording(selectedRaga, selectedInstrument)}
+              onStopRecording={() => stopRecording(selectedRaga, selectedInstrument, basePitchShift)}
           
           />
         {isRecording && (
