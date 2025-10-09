@@ -9,7 +9,7 @@ import useTonePlayer from './hooks/useTonePlayer';
 
 function App() {
   const [user, setUser] = useState(null);
-  const [selectedInstrument, setSelectedInstrument] = useState("Sitar");
+  const [selectedInstrument, setSelectedInstrument] = useState("Veena");
   const [basePitchShift, setBasePitchShift]=useState(0);
 
   const playNote = useTonePlayer(selectedInstrument, 0);

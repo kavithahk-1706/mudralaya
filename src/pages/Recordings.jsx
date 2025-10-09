@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ref, onValue, remove } from 'firebase/database'; // add remove
+import { ref, onValue, remove, update } from 'firebase/database'; 
+import { BsPencil } from 'react-icons/bs';
 import { db, auth } from '../firebase';
 import Navbar from '../components/NavBar';
 
@@ -10,6 +11,8 @@ export default function Recordings({ playNote }) {
   const [loading, setLoading] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [elapsed, setElapsed] = useState(0);
+  const [editingId, setEditingId] = useState(null); 
+  const [newName, setNewName] = useState(''); 
   const startTimeRef = useRef(null);
   const timeoutsRef = useRef([]);
   const navigate = useNavigate();
@@ -89,6 +92,20 @@ export default function Recordings({ playNote }) {
     }
   };
 
+    const renameRecording = async (id) => {
+    if (!newName.trim()) {
+      alert('name cannot be empty');
+      return;
+    }
+
+
+    
+    const recordingRef = ref(db, `recordings/${auth.currentUser.uid}/${id}`);
+    await update(recordingRef, { raga: newName });
+    setEditingId(null);
+    setNewName('');
+  };
+
   const deleteRecording = async (id) => {
     if (!confirm('Delete this recording?')) return;
     
@@ -121,10 +138,47 @@ export default function Recordings({ playNote }) {
                   className="p-5 bg-gray-50 rounded-xl border border-gray-200 hover:shadow-md transition-shadow"
                 >
                   <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-800 mb-2">
-                        {recording.raga}
-                      </h3>
+                    <div className="flex-1">
+                      {editingId === recording.id ? (
+                        <div className="flex gap-2 mb-2">
+                          <input
+                            type="text"
+                            value={newName}
+                            onChange={(e) => setNewName(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') renameRecording(recording.id);
+                              if (e.key === 'Escape') {
+                                setEditingId(null);
+                                setNewName('');
+                              }
+                            }}
+                            className="flex-1 px-3 py-1 border border-gray-300 text-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-teal-500"
+                            autoFocus
+                          />
+                          <button 
+                            onClick={() => renameRecording(recording.id)}
+                            className="px-5 py-2 bg-gradient-to-r from-purple-600/90 to-blue-500/90 text-white rounded-lg font-semibold hover:shadow-md transition-all duration-200"
+                          >
+                            Save
+                          </button>
+                          <button 
+                            onClick={() => {
+                              setEditingId(null);
+                              setNewName('');
+                            }}
+                            className="px-5 py-2 mx-3 bg-gradient-to-r from-purple-600/90 to-blue-500/90 text-white rounded-lg font-semibold hover:shadow-md transition-all duration-200"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="text-xl font-bold text-gray-800">
+                            {recording.raga}
+                          </h3>
+    
+                        </div>
+                      )}
                       <p className="text-sm text-gray-500 mb-1">
                         {new Date(recording.timestamp).toLocaleString()}
                       </p>
@@ -132,12 +186,21 @@ export default function Recordings({ playNote }) {
                         {recording.notes?.length || 0} notes • {recording.selectedInstrument || 'Unknown instrument'}
                       </p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
+                        <button
+                          onClick={() => {
+                            setEditingId(recording.id);
+                              setNewName(recording.raga);
+                          }}
+                            className="px-5 py-2 bg-gradient-to-r from-purple-600/90 to-blue-500/90 text-white rounded-lg font-semibold hover:shadow-md transition-all duration-200"
+                          >
+                            <BsPencil/>
+                        </button>
                       <button 
                         onClick={() => playback(recording.notes)}
                         className="px-5 py-2 bg-gradient-to-r from-teal-500/90 to-cyan-500/90 text-white rounded-lg font-semibold hover:shadow-md transition-all duration-200"
                       >
-                        {!isPlaying?"Play":isPaused?"Resume":"Pause"}
+                        {!isPlaying ? "Play" : isPaused ? "Resume" : "Pause"}
                       </button>
                       <button 
                         onClick={() => deleteRecording(recording.id)}
@@ -145,6 +208,8 @@ export default function Recordings({ playNote }) {
                       >
                         Delete
                       </button>
+
+                    
                     </div>
                   </div>
                 </div>
@@ -160,6 +225,6 @@ export default function Recordings({ playNote }) {
           </div>
         </div>
       </div>
-    </>
+    </>   
   );
 }

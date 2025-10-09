@@ -10,14 +10,16 @@ export default function useTonePlayer(selectedInstrument, basePitchShift = 0) {
     const prevInstrumentRef = useRef(null);
 
     const instrumentSamples = {
+      Veena: {"A4": "/assets/Veena_1_A.wav"},
       Sitar: { "C4": "/assets/Sitar_1_C.wav" },
-      Flute: {"C4": "/assets/Flute_1_C.mp3" },
-      Violin: {"G4":"/assets/Violin_1_G.wav"}
+      Flute: {"A#4": "/assets/Flute_2_Asharp.wav" },
+      Violin: {"G3":"/assets/Violin_1_G.wav"}
+      
     };
    
 
     useEffect(() => {
-      // only recreate if instrument actually changed
+ 
       if (prevInstrumentRef.current === selectedInstrument && samplerRef.current && samplerLoadedRef.current) {
         return;
       }
@@ -26,16 +28,17 @@ export default function useTonePlayer(selectedInstrument, basePitchShift = 0) {
 
       samplerLoadedRef.current = false;
 
-      // dispose old
+   
       samplerRef.current?.dispose();
       reverbRef.current?.dispose();
       delayRef.current?.dispose();
 
       reverbRef.current = new Tone.Reverb({
-        decay: 6,
+        decay: 0.8,
         preDelay: 0.2,
         wet: 0.2
       }).toDestination();
+      
 
       delayRef.current = new Tone.FeedbackDelay({
         delayTime: "8n",
@@ -53,7 +56,7 @@ export default function useTonePlayer(selectedInstrument, basePitchShift = 0) {
         onerror: (error) => {
           console.error(`${selectedInstrument} sampler failed:`, error);
         }
-      }).connect(reverbRef.current);
+      }).connect(delayRef.current);
 
       return () => {
         samplerRef.current?.dispose();

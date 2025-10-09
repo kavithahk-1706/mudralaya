@@ -37,7 +37,7 @@ export default function BasePitchDropdown({
           fontSize: '30px',
           textAlign:'center',
           color: '#fff',
-          background: `linear-gradient(45deg, hsla(275, 65%, 52%, 0.9), hsla(165, 75%, 50%, 0.9))`,
+          background: `linear-gradient(45deg, hsla(271, 65%, 52%, 0.88), hsla(165, 75%, 50%, 0.9))`,
           borderRadius: '10px',
           cursor: 'pointer',
           minWidth: '300px'

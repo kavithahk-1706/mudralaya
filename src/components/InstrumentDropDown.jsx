@@ -9,7 +9,7 @@ export default function InstrumentDropdown({
   hoveredOptionIndex,
   setHoveredOptionIndex 
 }) {
-  const instruments = ["Sitar","Flute","Violin"]; // add more as you get samples
+  const instruments = ["Veena","Sitar","Flute","Violin"]; 
 
   return (
     <div style={{ position: 'absolute', top:20, left: 625, zIndex: 10 }}>
@@ -58,9 +58,9 @@ export default function InstrumentDropdown({
                 color: '#ccc',
                 cursor: 'pointer',
                 borderBottom: '1px solid #444',
-                backgroundColor: hoveredOptionIndex === index ? '#686868a4' : 'transparent' // use state instead
+                backgroundColor: hoveredOptionIndex === index ? '#686868a4' : 'transparent' 
               }}
-              onMouseEnter={() => setHoveredOptionIndex(index)} // keep mouse support
+              onMouseEnter={() => setHoveredOptionIndex(index)} 
               onMouseLeave={() => setHoveredOptionIndex(null)}
             >
               {instrument}

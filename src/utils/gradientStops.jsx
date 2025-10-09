@@ -26,7 +26,7 @@ export default function generateMistyGradientStops(brightnessMultiplier = 1.0) {
   const gradientStops = [
     {
       offset: "0%",
-      color: adjustColor("hsla(275, 65%, 52%, 0.88)", brightnessMultiplier), // deep teal
+      color: adjustColor("hsla(271, 65%, 52%, 0.88)", brightnessMultiplier), // deep teal
       opacity: 1
     },
     {

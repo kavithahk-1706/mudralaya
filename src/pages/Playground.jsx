@@ -39,7 +39,7 @@ export default function Playground({
   const [instrumentDropdownOpen, setInstrumentDropdownOpen] = useState(false);
   const [pitchDropdownOpen, setPitchDropdownOpen] = useState(false);
 
-  const lastPlayedSwaraRef = useRef(null); // {swara, sthayi}
+  const lastPlayedSwaraRef = useRef(null); 
   const instrumentDropdownRef = useRef(null);
   const instrumentOptionsRef = useRef(null);
   const instrumentDropdownOpenRef=useRef(null);
@@ -103,14 +103,14 @@ export default function Playground({
           setHovered(null);
         }
       } else {
-        // only reset if this dropdown actually had a hover state
+      
         if (hoveredIndexRef.current !== null) {
           hoveredIndexRef.current = null;
           setHovered(null);
         }
       }
 
-      // check if clicking dropdown header to open
+    
       if (isPinching && !wasPinching && dropdownRect && !isOpen &&
           screenX >= dropdownRect.left && screenX <= dropdownRect.right &&
           screenY >= dropdownRect.top && screenY <= dropdownRect.bottom) {
@@ -118,7 +118,7 @@ export default function Playground({
       }
     };
 
-    // check all three dropdowns
+
     checkDropdown(
       dropdownRef, 
       optionsRef, 
@@ -135,7 +135,7 @@ export default function Playground({
       instrumentOptionsRef,
       instrumentDropdownOpenRef.current,
       setInstrumentDropdownOpen,
-      ["Flute", "Sitar", "Violin"],
+      ["Veena","Sitar", "Flute", "Violin"],
       setInstrumentHoveredIndex,
       (instrument) => {
         setSelectedInstrument(instrument);   
@@ -243,7 +243,7 @@ export default function Playground({
           padding: '8px',
           fontSize: '25px',
           color: '#ffffffff',
-          background: `linear-gradient(45deg, hsla(275, 65%, 52%, 0.9), hsla(165, 75%, 50%, 0.9))`,
+          background: `linear-gradient(45deg, hsla(271, 65%, 52%, 0.88), hsla(165, 75%, 50%, 0.9))`,
           borderRadius: '10px',
           border:'none',
           cursor: 'pointer',
@@ -267,7 +267,7 @@ export default function Playground({
           padding: '8px',
           fontSize: '25px',
           color: '#ffffffff',
-          background: `linear-gradient(45deg, hsla(275, 65%, 52%, 0.9), hsla(165, 75%, 50%, 0.9))`,
+          background: `linear-gradient(45deg, hsla(271, 65%, 52%, 0.88), hsla(165, 75%, 50%, 0.9))`,
           borderRadius: '10px',
           border: 'none',
           cursor: 'pointer',

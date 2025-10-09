@@ -96,7 +96,6 @@ export default function useHandTracking({
       const swaraBoxes = rowDrawer ? rowDrawer(ctx, canvas.width / 3, canvas.height / 2, activeInteractionRef.current) : [];
 
       // mouse interaction
-
       const { x: mx, y: my } = mousePosRef.current;
       let mouseInteraction = handleSwaraInteraction({ctx, swaraBoxes, x: mx, y: my, ref: mouseDownRef, prevRef: prevMouseDownRef, playNote, recordSwara});
       if (mouseInteraction.swara && mouseInteraction.mode==="Played"){ 
@@ -137,11 +136,6 @@ export default function useHandTracking({
           const scaleY = canvasRect.height / canvas.height;
           const screenX = x * scaleX + canvasRect.left;
           const screenY = y * scaleY + canvasRect.top;
-
-
-
-
-
 
           
           // hand interaction with swaras
