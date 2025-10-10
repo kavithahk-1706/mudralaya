@@ -6,6 +6,7 @@ import useTonePlayer from "../hooks/useTonePlayer";
 import InstrumentDropdown from "../components/InstrumentDropDown";
 import BasePitchDropdown from "../components/BasePitchDropdown";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 
 import useRecording from "../hooks/useRecording";
@@ -19,9 +20,11 @@ export default function Playground({
   setBasePitchShift
 }) {
 
+
+  const navigate=useNavigate();
   const homeButtonRef = useRef(null);
   const recordingsButtonRef = useRef(null);
-
+  const recordButtonRef=useRef(null);
 
   const [selectedRaga, setSelectedRaga] = useState(ragaData[0].name);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -48,6 +51,7 @@ export default function Playground({
   const pitchDropdownOpenRef=useRef(null);
 
 
+
   const vidRef = useRef(null);
   const canvasRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -57,26 +61,31 @@ export default function Playground({
   const ragaHoveredIndexRef = useRef(null);
   const instrumentHoveredIndexRef = useRef(null);
   const pitchHoveredIndexRef = useRef(null);
-  
+  const isRecordingRef = useRef(isRecording);
 
 
   const [ragaHoveredIndex, setRagaHoveredIndex] = useState(null);
   const [instrumentHoveredIndex, setInstrumentHoveredIndex] = useState(null);
   const [pitchHoveredIndex, setPitchHoveredIndex] = useState(null);
+  const [homeButtonHoveredIndex, setHomeButtonHoveredIndex]=useState(null);
+  const [recordingsPageButtonHoveredIndex, setRecordingsPageButtonHoveredIndex]=useState(null);
+  const [recordButtonHoveredIndex, setRecordButtonHoveredIndex]=useState(null);
+
+
+  useEffect(() => {
+    isRecordingRef.current = isRecording;
+  }, [isRecording]);
 
   //handle dropdowns
-  const handleAllDropdownInteractions = (x, y, isPinching, wasPinching) => {
+  const handleAllDropdownInteractions = (screenX, screenY, isPinching, wasPinching) => {
     const canvas = canvasRef.current;
+
+
+
     if (!canvas) return;
     
-    const canvasRect = canvas.getBoundingClientRect();
-    const scaleX = canvasRect.width / canvas.width;
-    const scaleY = canvasRect.height / canvas.height;
-    const screenX = x * scaleX + canvasRect.left;
-    const screenY = y * scaleY + canvasRect.top;
 
-    
-  
+
 
     const checkDropdown = (dropdownRef, optionsRef, isOpen, setOpen, options, setHovered, onSelect, hoveredIndexRef) => {
       const dropdownRect = dropdownRef.current?.getBoundingClientRect();
@@ -110,6 +119,8 @@ export default function Playground({
         }
       }
 
+      
+
     
       if (isPinching && !wasPinching && dropdownRect && !isOpen &&
           screenX >= dropdownRect.left && screenX <= dropdownRect.right &&
@@ -118,6 +129,19 @@ export default function Playground({
       }
     };
 
+    const checkButton = (buttonRef, onClick, hoveredIndex, setHoveredIndex) => {
+        const buttonRect=buttonRef.current?.getBoundingClientRect();
+        
+
+        if(buttonRect && screenX>=buttonRect.left && screenX<=buttonRect.right && 
+          screenY>=buttonRect.top && screenY<=buttonRect.bottom) {
+            setHoveredIndex(hoveredIndex);
+            if(isPinching && !wasPinching){
+              console.log("button", buttonRect);
+              onClick();
+            }
+          }
+      }
 
     checkDropdown(
       dropdownRef, 
@@ -172,7 +196,33 @@ export default function Playground({
       (option) => setBasePitchShift(option.value),
       pitchHoveredIndexRef
     );
- 
+
+    checkButton(homeButtonRef, ()=>{if(isPinching && !wasPinching) navigate('/')}, homeButtonHoveredIndex, setHomeButtonHoveredIndex);
+    checkButton(recordingsButtonRef, ()=>{if(isPinching && !wasPinching) navigate('/recordings')}, recordingsPageButtonHoveredIndex, setRecordingsPageButtonHoveredIndex);
+      
+    const homeRect = homeButtonRef.current?.getBoundingClientRect();
+    const recordingsRect = recordingsButtonRef.current?.getBoundingClientRect();
+    if (homeRect && recordingsRect) {
+      console.log(
+        "Home button top/bottom:", homeRect.top, homeRect.bottom,
+        "Recordings button top/bottom:", recordingsRect.top, recordingsRect.bottom
+      );
+}
+    checkButton(
+      recordButtonRef, 
+      () => {
+        if(isPinching && !wasPinching){
+        if(isRecordingRef.current) {
+          stopRecording(selectedRaga, selectedInstrument, basePitchShift);
+        } else {
+          startRecording();
+        }
+      }
+    },
+      recordButtonHoveredIndex, 
+      setRecordButtonHoveredIndex
+    );   
+        
   };
 
 
@@ -286,20 +336,21 @@ export default function Playground({
               isRecording={isRecording}
               onStartRecording={() => startRecording()}
               onStopRecording={() => stopRecording(selectedRaga, selectedInstrument, basePitchShift)}
+              ref={recordButtonRef}
           
           />
         {isRecording && (
           <div style={{
-            position: 'absolute',
-            bottom: 50,
-            right: 30,
+            position: 'fixed', // changed from absolute
+            bottom: 75,
+            right: 375,
             color: 'white',
             fontSize: '24px',
             fontWeight: '600',
-            textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
+            textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+            zIndex: 1000 // make sure it's on top
           }}>
             {formatDuration(duration)}
-            
           </div>
         )}   
 

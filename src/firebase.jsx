@@ -8,14 +8,14 @@ import { getDatabase } from "firebase/database";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBDrBOU5gRCZxTKut-1H75ddvxRk4tuA1k",
-  authDomain: "mudralaya-a9bd0.firebaseapp.com",
-  databaseURL: "https://mudralaya-a9bd0-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "mudralaya-a9bd0",
-  storageBucket: "mudralaya-a9bd0.firebasestorage.app",
-  messagingSenderId: "110898391725",
-  appId: "1:110898391725:web:46ddfb4909e4fd1b3fb424"
-};
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
+}
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

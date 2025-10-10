@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { auth, googleProvider } from '../firebase';
 import { signInWithPopup } from 'firebase/auth';
 import { BsRecordCircle, BsStopCircle } from 'react-icons/bs';
+import { forwardRef } from 'react';
 
-export default function RecordButton({ isRecording, onStartRecording, onStopRecording }) {
+const RecordButton=forwardRef(({ isRecording, onStartRecording, onStopRecording }, ref) =>{
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -45,6 +46,7 @@ export default function RecordButton({ isRecording, onStartRecording, onStopReco
           ...buttonStyle,
           background: 'linear-gradient(45deg, hsla(0, 75%, 50%, 0.9), hsla(15, 85%, 45%, 0.9))'
         }}
+        ref={ref}
       >
         Login to Record
       </button>
@@ -60,9 +62,12 @@ export default function RecordButton({ isRecording, onStartRecording, onStopReco
           ? 'linear-gradient(45deg, hsla(0, 75%, 50%, 0.9), hsla(15, 85%, 45%, 0.9))'
           : 'linear-gradient(45deg, hsla(275, 65%, 52%, 0.9), hsla(165, 75%, 50%, 0.9))'
       }}
+      ref={ref}
     >
       {isRecording ? <BsStopCircle /> : <BsRecordCircle />}
       {isRecording ? 'Click to stop Recording' : 'Click to Record'}
     </button>
   );
-}
+});
+
+export default RecordButton;

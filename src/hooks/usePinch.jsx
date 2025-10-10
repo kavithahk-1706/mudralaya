@@ -9,5 +9,5 @@ export default function usePinch(landmarks){
 
     const distance=Math.sqrt(dx*dx+dy*dy);
 
-    return [distance, distance < 0.065];
+    return [distance, distance < 0.060];
 }

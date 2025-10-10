@@ -97,6 +97,7 @@ export default function useHandTracking({
 
       // mouse interaction
       const { x: mx, y: my } = mousePosRef.current;
+ 
       let mouseInteraction = handleSwaraInteraction({ctx, swaraBoxes, x: mx, y: my, ref: mouseDownRef, prevRef: prevMouseDownRef, playNote, recordSwara});
       if (mouseInteraction.swara && mouseInteraction.mode==="Played"){ 
         currentSwaraRef.current={
@@ -109,7 +110,11 @@ export default function useHandTracking({
 
 
       if (handleAllDropdownInteractions) {
-          handleAllDropdownInteractions(mx, my, mouseDownRef.current, prevMouseDownRef.current);
+         
+          const rect = canvas.getBoundingClientRect();
+          const mouseScreenX = (mx / canvas.width) * rect.width + rect.left;
+          const mouseScreenY = (my / canvas.height) * rect.height + rect.top;
+          handleAllDropdownInteractions(mouseScreenX, mouseScreenY, mouseDownRef.current, prevMouseDownRef.current);
       } 
         prevMouseDownRef.current = mouseDownRef.current;
 
@@ -120,7 +125,6 @@ export default function useHandTracking({
       if (results.multiHandLandmarks && results.multiHandedness) {
         for (let i = 0; i < results.multiHandLandmarks.length; i++) {
           const landmarks = results.multiHandLandmarks[i];
-          const handType = results.multiHandedness[i].label === "Right" ? "Left" : "Right";
 
           drawConnectors(ctx, landmarks, HAND_CONNECTIONS, { color: "#000", lineWidth: 1 });
           drawLandmarks(ctx, landmarks, { color: "#000", radius: 1 });
@@ -130,12 +134,22 @@ export default function useHandTracking({
 
           const { x, y } = flipLandmark(landmarks[8], canvas);
 
-         
-          const canvasRect = canvas.getBoundingClientRect();
-          const scaleX = canvasRect.width / canvas.width;
-          const scaleY = canvasRect.height / canvas.height;
-          const screenX = x * scaleX + canvasRect.left;
-          const screenY = y * scaleY + canvasRect.top;
+     
+          const rect = canvas.getBoundingClientRect();
+          const scaleY = rect.height / canvas.height;
+          const screenX = x * (rect.width / canvas.width) + rect.left;
+          const screenY = y * scaleY + rect.top + (canvas.height - rect.height)*0.8;
+
+
+       
+
+
+
+
+          
+
+
+
 
           
           // hand interaction with swaras
@@ -148,12 +162,10 @@ export default function useHandTracking({
             activeInteractionRef.current = handInteraction;
           }
           if(handleAllDropdownInteractions){
-            handleAllDropdownInteractions(x, y, currentlyPinching, isPinchingRef.current);
+            handleAllDropdownInteractions(screenX, screenY, currentlyPinching, isPinchingRef.current);
 
           }
-          
-          
-
+        
         
           isPinchingRef.current = currentlyPinching;
         }
