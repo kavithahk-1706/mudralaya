@@ -65,7 +65,7 @@ export default function useTonePlayer(selectedInstrument, basePitchShift = 0) {
       };
     }, [selectedInstrument]);
 
-    const playNote = useCallback(async (swara, sthayi) => {
+    const playNote = useCallback(async (swara, sthayi, pitch) => {
       if (!samplerRef.current || !samplerLoadedRef.current) {
         return;
       }
@@ -74,8 +74,9 @@ export default function useTonePlayer(selectedInstrument, basePitchShift = 0) {
         await Tone.start(); 
         toneStartedRef.current = true;
       }
+      const pitchToUse = pitch !== undefined ? pitch : basePitchShift;
 
-      const note = getSwaraNote(swara, sthayi, basePitchShift);
+      const note = getSwaraNote(swara, sthayi, pitchToUse);
 
       samplerRef.current.triggerAttackRelease(note, "2");
     }, [basePitchShift]);

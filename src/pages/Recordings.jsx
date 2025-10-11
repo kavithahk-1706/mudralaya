@@ -63,7 +63,7 @@ export default function Recordings({ playNote }) {
       notes.forEach(note => {
         const delay = note.timestamp - elapsed;
         if (delay >= 0) {
-          const t = setTimeout(() => playNote(note.swara, note.sthayi), delay);
+          const t = setTimeout(() => playNote(note.swara, note.sthayi, recording.basePitchShift || 0), delay);
           timeoutsRefs.current[id].push(t);
         }
       });
