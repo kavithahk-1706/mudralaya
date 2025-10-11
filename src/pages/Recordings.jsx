@@ -121,7 +121,19 @@ export default function Recordings({ playNote }) {
   };
 
   const deleteRecording = async (id) => {
-    if (!confirm('Delete this recording?')) return;
+    if(!confirm("Delete this recording?")) return;
+    // clear all timeouts for this recording
+    if (timeoutsRefs.current[id]) {
+      timeoutsRefs.current[id].forEach(t => clearTimeout(t));
+      timeoutsRefs.current[id] = [];
+    }
+    
+    // clear the playing state
+    setPlayingStates(prev => {
+      const newStates = { ...prev };
+      delete newStates[id];
+      return newStates;
+    });
     
     const recordingRef = ref(db, `recordings/${auth.currentUser.uid}/${id}`);
     await remove(recordingRef);
