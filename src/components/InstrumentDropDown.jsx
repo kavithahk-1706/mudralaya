@@ -1,4 +1,3 @@
-// InstrumentDropdown.jsx
 export default function InstrumentDropdown({ 
   selectedInstrument, 
   setSelectedInstrument, 

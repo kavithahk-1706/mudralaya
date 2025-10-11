@@ -4,8 +4,8 @@ import { db, auth } from '../firebase';
 
 export default function useRecording() {
   const [duration, setDuration] = useState(0);
-  const isRecordingRef = useRef(false); // use ref instead
-  const [isRecordingState, setIsRecordingState] = useState(false); // keep state for UI
+  const isRecordingRef = useRef(false); 
+  const [isRecordingState, setIsRecordingState] = useState(false); 
   const recordingData = useRef([]);
   const startTimeRef = useRef(null);
   const timerRef = useRef(null);

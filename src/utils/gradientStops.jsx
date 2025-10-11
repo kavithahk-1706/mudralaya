@@ -22,26 +22,26 @@ export default function generateMistyGradientStops(brightnessMultiplier = 1.0) {
     return `hsla(${h}, ${newS}%, ${newL}%, ${a})`;
   };
 
-  // peacock vibes - teal to emerald to deep blue with purple hints
+
   const gradientStops = [
     {
       offset: "0%",
-      color: adjustColor("hsla(271, 65%, 52%, 0.88)", brightnessMultiplier), // deep teal
+      color: adjustColor("hsla(271, 65%, 52%, 0.88)", brightnessMultiplier),
       opacity: 1
     },
     {
       offset: "30%",
-      color: adjustColor("hsla(200, 80%, 48%, 0.93)", brightnessMultiplier), // emerald-teal
+      color: adjustColor("hsla(200, 80%, 48%, 0.93)", brightnessMultiplier), 
       opacity: 1
     },
     {
       offset: "65%",
-      color: adjustColor("hsla(165, 75%, 50%, 0.95)", brightnessMultiplier), // peacock blue
+      color: adjustColor("hsla(165, 75%, 50%, 0.95)", brightnessMultiplier), 
       opacity: 1
     },
     {
       offset: "100%",
-      color: adjustColor("hsla(176, 74%, 71%, 0.92)", brightnessMultiplier), // blue with purple undertone
+      color: adjustColor("hsla(176, 74%, 71%, 0.92)", brightnessMultiplier), 
       opacity: 1
     }
   ];
@@ -49,12 +49,4 @@ export default function generateMistyGradientStops(brightnessMultiplier = 1.0) {
   return gradientStops;
 };
 
-/*
-hsla(275, 65%, 52%, 0.88)
-
-hsla(165, 75%, 50%, 0.95)
-hsla(176, 74%, 71%, 0.92)
-
-
-*/ 
 
