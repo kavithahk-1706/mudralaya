@@ -197,7 +197,7 @@ export default function Recordings({ playNote }) {
                           />
                           <button 
                             onClick={() => renameRecording(recording.id)}
-                            className="px-5 py-2 bg-gradient-to-r from-purple-600/90 to-blue-500/90 text-white rounded-lg font-semibold hover:shadow-md transition-all duration-200"
+                            className="px-5 py-2 bg-gradient-to-r from-purple-600/90 to-blue-500/90 text-white rounded-lg font-semibold hover:scale-110 duration-200 font-medium"
                           >
                             Save
                           </button>
@@ -206,7 +206,7 @@ export default function Recordings({ playNote }) {
                               setEditingId(null);
                               setNewName('');
                             }}
-                            className="px-5 py-2 mx-3 bg-gradient-to-r from-purple-600/90 to-blue-500/90 text-white rounded-lg font-semibold hover:shadow-md transition-all duration-200"
+                            className="px-5 py-2 mx-3 bg-gradient-to-r from-purple-600/90 to-blue-500/90 text-white rounded-lg font-semibold hover:scale-110 duration-200 font-medium"
                           >
                             Cancel
                           </button>
@@ -231,14 +231,14 @@ export default function Recordings({ playNote }) {
                           setEditingId(recording.id);
                           setNewName(recording.raga);
                         }}
-                        className="px-5 py-2 bg-gradient-to-r from-purple-600/90 to-blue-500/90 text-white rounded-lg font-semibold hover:shadow-md transition-all duration-200"
+                        className="px-5 py-2 bg-gradient-to-r from-purple-600/90 to-blue-500/90 text-white rounded-lg font-semibold hover:scale-110 duration-200 font-medium"
                       >
                         <BsPencil/>
                       </button>
 
                       <button 
                         onClick={() => playback(recording)}
-                        className="px-5 py-2 bg-gradient-to-r from-teal-500/90 to-cyan-500/90 text-white rounded-lg font-semibold hover:shadow-md transition-all duration-200"
+                        className="px-5 py-2 bg-gradient-to-r from-teal-500/90 to-cyan-500/90 text-white rounded-lg font-semibold hover:scale-110 duration-200 font-medium"
                       >
                         {!playingStates[recording.id]?.isPlaying ? "Play" :
                           playingStates[recording.id]?.isPaused ? "Resume" : "Pause"}
@@ -246,7 +246,7 @@ export default function Recordings({ playNote }) {
 
                       <button 
                         onClick={() => deleteRecording(recording.id)}
-                        className="px-5 py-2 bg-gradient-to-r from-red-500/90 to-red-600/90 text-white rounded-lg font-semibold hover:shadow-md transition-all duration-200"
+                        className="px-5 py-2 bg-gradient-to-r from-red-500/90 to-red-600/90 text-white rounded-lg font-semibold hover:scale-110 duration-200 font-medium"
                       >
                         Delete
                       </button>
@@ -258,7 +258,7 @@ export default function Recordings({ playNote }) {
           )}
           <div className="mt-8">
             <Link to="/playground" className="flex justify-center">
-              <button className="px-6 py-3 bg-gradient-to-r from-purple-600/90 to-teal-500/90 text-white rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200">
+              <button className="px-6 py-3 bg-gradient-to-r from-purple-600/90 to-teal-500/90 text-white rounded-lg font-semibold shadow-md hover:scale-110 duration-200 font-medium">
                 Go to Playground
               </button>
             </Link>

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import Navbar from '../components/NavBar';
+import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
 
 export default function Home() {
   const ragas = [
@@ -8,7 +9,7 @@ export default function Home() {
     "Shuddha Saveri", "Niroshta"
   ];
 
-  const instruments = ["Sitar", "Flute", "Violin"];
+  const instruments = ["Veena", "Sitar", "Flute", "Violin"];
 
   return (
     <>
@@ -79,19 +80,68 @@ export default function Home() {
             <p className="text-gray-600 leading-relaxed m-0">
               This is just a playground and learning tool, not a substitute for actual practice with a guru. 
               You can use it to get familiar with how ragas work, try out different patterns, but it <strong>cannot replace actual learning</strong>.
-              
             </p>
           </div>
 
           {/* CTA */}
           <div className="text-center">
+            <div className="mb-6 hover:scale-110 duration-200 font-medium">
+              <a 
+                href="https://youtu.be/SKOpkNU-Cac" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:opacity-80 transition-opacity"
+              >
+                <span className="font-semibold bg-gradient-to-r from-purple-600 to-teal-500 bg-clip-text text-transparent">
+                  Watch a quick demo →
+                </span>
+              </a>
+            </div>
+          </div>          
+          <div className="text-center">
             <Link to="/playground">
-              <button className="px-12 py-4 border-none text-lg bg-gradient-to-r from-purple-600/90 to-teal-500/90 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200">
+              <button className="px-12 py-4 border-none text-lg bg-gradient-to-r from-purple-600/90 to-teal-500/90 text-white rounded-xl font-semibold hover:scale-110 transition-transform duration-200">
                 Try it out
               </button>
             </Link>
+
+          {/* Contact Links */}
+          <div className="text-center m-10">
+            <h3 className="text-2xl mb-4 text-gray-800 font-bold">Connect with me</h3>
+            <div className="flex justify-center gap-6">
+              <a 
+                href="https://www.linkedin.com/in/kavitha-haima-kidambi-615791353" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-purple-600 hover:text-purple-700 transition-colors duration-200"
+              >
+                <FaLinkedin className="w-10 h-10 bg-gradient-to-r from-purple-600/90 to-teal-500/90 text-white rounded-sm hover:scale-110 transition-transform duration-200" />
+              </a>
+              <a 
+                href="https://github.com/kavithahk-1706" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-700 hover:text-gray-900 transition-colors duration-200"
+              >
+                <FaGithub className="w-10 h-10  bg-gradient-to-r from-purple-600/90 to-teal-500/90  text-white rounded-3xl hover:scale-110 transition-transform duration-200" />
+              </a>
+              <a 
+                href="mailto:kavithahaimakidambi0613@gmail.com" 
+                className="text-teal-600 hover:text-teal-700 transition-colors duration-200"
+              >
+                <FaEnvelope className="w-10 h-10 hover:scale-110 bg-gradient-to-r from-purple-600/90 to-teal-500/90 text-white rounded-lg px-1 transition-transform duration-200" />
+              </a>
+            </div>
+          </div>
             <p className="mt-4 text-gray-500 text-sm">
               Browser-based. No installation required.
+            </p>
+          </div>
+          
+          {/*Footer*/}
+          <div className="text-center mt-12 pt-8 border-t border-gray-200">
+            <p className="text-gray-600 text-sm">
+              <em>Built with love and devotion by <a href="https://www.linkedin.com/in/kavitha-haima-kidambi-615791353" target="_blank"><span className="font-semibold bg-gradient-to-r from-purple-600 to-teal-500 bg-clip-text text-transparent">Kavitha Haima Kidambi</span></a></em>
             </p>
           </div>
         </div>
