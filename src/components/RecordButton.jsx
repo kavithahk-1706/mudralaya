@@ -23,7 +23,7 @@ const RecordButton = forwardRef(({ isRecording, onStartRecording, onStopRecordin
   if (!user) {
     return (
       <button 
-        onClick={onLogin}  // use the prop
+        onClick={onLogin}
         style={{
           ...buttonStyle,
           background: 'linear-gradient(45deg, hsla(0, 75%, 50%, 0.9), hsla(15, 85%, 45%, 0.9))'
