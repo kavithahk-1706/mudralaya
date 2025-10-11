@@ -1,25 +1,7 @@
-import { useState, useEffect } from 'react';
-import { auth, googleProvider } from '../firebase';
-import { signInWithPopup } from 'firebase/auth';
 import { BsRecordCircle, BsStopCircle } from 'react-icons/bs';
 import { forwardRef } from 'react';
 
-const RecordButton=forwardRef(({ isRecording, onStartRecording, onStopRecording }, ref) =>{
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(setUser);
-    return unsubscribe;
-  }, []);
-
-  const handleLoginPrompt = async () => {
-    try {
-      await signInWithPopup(auth, googleProvider);
-    } catch (error) {
-      console.error('login failed:', error);
-    }
-  };
-
+const RecordButton = forwardRef(({ isRecording, onStartRecording, onStopRecording, onLogin, user }, ref) => {
   const buttonStyle = {
     position: 'absolute',
     top: 575,
@@ -41,7 +23,7 @@ const RecordButton=forwardRef(({ isRecording, onStartRecording, onStopRecording 
   if (!user) {
     return (
       <button 
-        onClick={handleLoginPrompt}
+        onClick={onLogin}  // use the prop
         style={{
           ...buttonStyle,
           background: 'linear-gradient(45deg, hsla(0, 75%, 50%, 0.9), hsla(15, 85%, 45%, 0.9))'

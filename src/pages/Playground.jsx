@@ -1,3 +1,4 @@
+//imports
 import { useEffect, useRef, useState } from "react";
 import useHandTracking from "../hooks/useHandTracking";
 import RagaDropdown from "../components/RagaDropDown";
@@ -7,8 +8,8 @@ import InstrumentDropdown from "../components/InstrumentDropDown";
 import BasePitchDropdown from "../components/BasePitchDropdown";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-
-
+import { auth, googleProvider } from '../firebase';
+import { signInWithPopup } from 'firebase/auth';
 import useRecording from "../hooks/useRecording";
 import RecordButton from "../components/RecordButton";
 
@@ -20,28 +21,29 @@ export default function Playground({
   setBasePitchShift
 }) {
 
-
+  //navigate hook
   const navigate=useNavigate();
+
+  //toneplayer custom hook
+  const playNote = useTonePlayer(selectedInstrument, basePitchShift);
+
+  //states
+  const [selectedRaga, setSelectedRaga] = useState(ragaData[0].name);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [instrumentDropdownOpen, setInstrumentDropdownOpen] = useState(false);
+  const [pitchDropdownOpen, setPitchDropdownOpen] = useState(false);
+  const [ragaHoveredIndex, setRagaHoveredIndex] = useState(null);
+  const [instrumentHoveredIndex, setInstrumentHoveredIndex] = useState(null);
+  const [pitchHoveredIndex, setPitchHoveredIndex] = useState(null);
+  const [homeButtonHoveredIndex, setHomeButtonHoveredIndex]=useState(null);
+  const [recordingsPageButtonHoveredIndex, setRecordingsPageButtonHoveredIndex]=useState(null);
+  const [recordButtonHoveredIndex, setRecordButtonHoveredIndex]=useState(null);
+  const { isRecording, duration, startRecording, recordSwara, stopRecording } = useRecording();
+
+  //refs
   const homeButtonRef = useRef(null);
   const recordingsButtonRef = useRef(null);
   const recordButtonRef=useRef(null);
-
-  const [selectedRaga, setSelectedRaga] = useState(ragaData[0].name);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-
-  
-  const { isRecording, duration, startRecording, recordSwara, stopRecording } = useRecording();
-    const formatDuration = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const playNote = useTonePlayer(selectedInstrument, basePitchShift);
-
-  const [instrumentDropdownOpen, setInstrumentDropdownOpen] = useState(false);
-  const [pitchDropdownOpen, setPitchDropdownOpen] = useState(false);
-
   const lastPlayedSwaraRef = useRef(null); 
   const instrumentDropdownRef = useRef(null);
   const instrumentOptionsRef = useRef(null);
@@ -49,9 +51,6 @@ export default function Playground({
   const pitchDropdownRef = useRef(null);
   const pitchOptionsRef = useRef(null);
   const pitchDropdownOpenRef=useRef(null);
-
-
-
   const vidRef = useRef(null);
   const canvasRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -62,31 +61,31 @@ export default function Playground({
   const instrumentHoveredIndexRef = useRef(null);
   const pitchHoveredIndexRef = useRef(null);
   const isRecordingRef = useRef(isRecording);
+  const userRef = useRef(user);
 
 
-  const [ragaHoveredIndex, setRagaHoveredIndex] = useState(null);
-  const [instrumentHoveredIndex, setInstrumentHoveredIndex] = useState(null);
-  const [pitchHoveredIndex, setPitchHoveredIndex] = useState(null);
-  const [homeButtonHoveredIndex, setHomeButtonHoveredIndex]=useState(null);
-  const [recordingsPageButtonHoveredIndex, setRecordingsPageButtonHoveredIndex]=useState(null);
-  const [recordButtonHoveredIndex, setRecordButtonHoveredIndex]=useState(null);
+  //function to format duration of recording
+  const formatDuration = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
+  //user state/login handler
+  const handleLogin = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+      console.error('login failed:', error);
+    }
+  };
 
-  useEffect(() => {
-    isRecordingRef.current = isRecording;
-  }, [isRecording]);
-
-  //handle dropdowns
+  //handle dropdowns and buttons through hand tracking
   const handleAllDropdownInteractions = (screenX, screenY, isPinching, wasPinching) => {
     const canvas = canvasRef.current;
-
-
-
     if (!canvas) return;
-    
 
-
-
+    //dropdowns check
     const checkDropdown = (dropdownRef, optionsRef, isOpen, setOpen, options, setHovered, onSelect, hoveredIndexRef) => {
       const dropdownRect = dropdownRef.current?.getBoundingClientRect();
       const optionsRect = optionsRef.current?.getBoundingClientRect();
@@ -119,9 +118,6 @@ export default function Playground({
         }
       }
 
-      
-
-    
       if (isPinching && !wasPinching && dropdownRect && !isOpen &&
           screenX >= dropdownRect.left && screenX <= dropdownRect.right &&
           screenY >= dropdownRect.top && screenY <= dropdownRect.bottom) {
@@ -129,20 +125,21 @@ export default function Playground({
       }
     };
 
+    //buttons check
     const checkButton = (buttonRef, onClick, hoveredIndex, setHoveredIndex) => {
         const buttonRect=buttonRef.current?.getBoundingClientRect();
-        
-
         if(buttonRect && screenX>=buttonRect.left && screenX<=buttonRect.right && 
           screenY>=buttonRect.top && screenY<=buttonRect.bottom) {
             setHoveredIndex(hoveredIndex);
             if(isPinching && !wasPinching){
-              console.log("button", buttonRect);
               onClick();
             }
           }
       }
 
+    //call the dropdown checks for handtracking
+
+    //raga
     checkDropdown(
       dropdownRef, 
       optionsRef, 
@@ -154,6 +151,7 @@ export default function Playground({
       ragaHoveredIndexRef
     );
 
+    //instrument
     checkDropdown(
       instrumentDropdownRef,
       instrumentOptionsRef,
@@ -168,6 +166,7 @@ export default function Playground({
       instrumentHoveredIndexRef
     );
 
+    //pitch options for pitch dropdown
     const pitchOptions = [
 
     { value: -6, label: "-6 semitones (F#3)" },
@@ -186,7 +185,8 @@ export default function Playground({
 
   ];
 
-    checkDropdown(
+  //pitch
+  checkDropdown(
       pitchDropdownRef,
       pitchOptionsRef,
       pitchDropdownOpenRef.current,
@@ -195,30 +195,39 @@ export default function Playground({
       setPitchHoveredIndex,
       (option) => setBasePitchShift(option.value),
       pitchHoveredIndexRef
+  );
+
+    //check buttons for handtracking
+
+    //back to home button
+    checkButton(
+      homeButtonRef, 
+      ()=>{if(isPinching && !wasPinching) navigate('/')}, 
+      homeButtonHoveredIndex, setHomeButtonHoveredIndex
     );
 
-    checkButton(homeButtonRef, ()=>{if(isPinching && !wasPinching) navigate('/')}, homeButtonHoveredIndex, setHomeButtonHoveredIndex);
-    checkButton(recordingsButtonRef, ()=>{if(isPinching && !wasPinching) navigate('/recordings')}, recordingsPageButtonHoveredIndex, setRecordingsPageButtonHoveredIndex);
-      
-    const homeRect = homeButtonRef.current?.getBoundingClientRect();
-    const recordingsRect = recordingsButtonRef.current?.getBoundingClientRect();
-    if (homeRect && recordingsRect) {
-      console.log(
-        "Home button top/bottom:", homeRect.top, homeRect.bottom,
-        "Recordings button top/bottom:", recordingsRect.top, recordingsRect.bottom
-      );
-}
+    //view recordings page button
+    checkButton(
+      recordingsButtonRef, 
+      ()=>{if(isPinching && !wasPinching) navigate('/recordings')}, 
+      recordingsPageButtonHoveredIndex, 
+      setRecordingsPageButtonHoveredIndex
+    );
+
+    //start recording button (checks user state and triggers login if not logged in)
     checkButton(
       recordButtonRef, 
       () => {
-        if(isPinching && !wasPinching){
-        if(isRecordingRef.current) {
-          stopRecording(selectedRaga, selectedInstrument, basePitchShift);
-        } else {
-          startRecording();
-        }
-      }
-    },
+          if (!userRef.current) {
+            handleLogin();  
+            return;
+          }
+          if (isRecordingRef.current) {
+            stopRecording(selectedRaga, selectedInstrument, basePitchShift);
+          } else {
+            startRecording();
+          }
+      },
       recordButtonHoveredIndex, 
       setRecordButtonHoveredIndex
     );   
@@ -235,6 +244,15 @@ export default function Playground({
     dropdownOpenRef.current = dropdownOpen;
   }, [dropdownOpen]);
 
+  useEffect(() => {
+    isRecordingRef.current = isRecording;
+  }, [isRecording]);
+
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
+
+  //call the main hand tracking hook/
   useHandTracking({
     selectedRagaRef,
     vidRef,
@@ -243,6 +261,8 @@ export default function Playground({
     recordSwara,
     handleAllDropdownInteractions 
   });
+
+
 
   
   return (
@@ -303,9 +323,7 @@ export default function Playground({
           onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
           onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
           >
-
             Back to Home
-            
         </button>
       </Link>
 
@@ -334,21 +352,22 @@ export default function Playground({
       <div onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'} onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}>
          <RecordButton 
               isRecording={isRecording}
+              onLogin={handleLogin}
+              user={user}
               onStartRecording={() => startRecording()}
               onStopRecording={() => stopRecording(selectedRaga, selectedInstrument, basePitchShift)}
               ref={recordButtonRef}
-          
           />
         {isRecording && (
           <div style={{
-            position: 'fixed', // changed from absolute
+            position: 'fixed', 
             bottom: 75,
             right: 375,
             color: 'white',
             fontSize: '24px',
             fontWeight: '600',
             textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-            zIndex: 1000 // make sure it's on top
+            zIndex: 1000
           }}>
             {formatDuration(duration)}
           </div>
