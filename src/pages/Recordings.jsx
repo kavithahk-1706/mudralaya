@@ -21,6 +21,20 @@ export default function Recordings({ playNote }) {
   const timeoutsRefs = useRef({});
   const startTimesRefs = useRef({});
 
+
+  useEffect(() => {
+
+    return () => {
+     
+      Object.values(timeoutsRefs.current).forEach(timeoutArray => {
+        if (timeoutArray) {
+          timeoutArray.forEach(t => clearTimeout(t));
+        }
+      });
+      timeoutsRefs.current = {};
+    };
+  }, []);
+
   useEffect(() => {
     if (!auth.currentUser) {
       navigate('/');
@@ -72,7 +86,7 @@ export default function Recordings({ playNote }) {
       const finalTimeout = setTimeout(() => {
         setPlayingStates(prev => ({ ...prev, [id]: { isPlaying: false, isPaused: false, elapsed: 0 } }));
         timeoutsRefs.current[id] = [];
-      }, Math.max(...notes.map(n => n.timestamp)) - elapsed + 100); // small buffer
+      }, Math.max(...notes.map(n => n.timestamp)) - elapsed + 100);
       timeoutsRefs.current[id].push(finalTimeout);
 
       setPlayingStates(prev => ({ ...prev, [id]: { isPlaying: true, isPaused: false, elapsed: 0 } }));
@@ -92,7 +106,7 @@ export default function Recordings({ playNote }) {
       notes.forEach(note => {
         const delay = note.timestamp - elapsed;
         if (delay >= 0) {
-          const t = setTimeout(() => playNote(note.swara, note.sthayi), delay);
+          const t = setTimeout(() => playNote(note.swara, note.sthayi, recording.basePitchShift || 0), delay);
           timeoutsRefs.current[id].push(t);
         }
       });
