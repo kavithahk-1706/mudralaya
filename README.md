@@ -163,5 +163,6 @@ Built with love and devotion for Krishna and Maa Saraswathi
 ---
 
 ## Demo
-![Mudralaya Demo](https://www.youtube.com/watch?v=SKOpkNU-Cac&feature=youtu.be)
+[Mudralaya Demo](https://www.youtube.com/watch?v=SKOpkNU-Cac&feature=youtu.be)
+
 
