@@ -57,7 +57,7 @@ It's more of a companion to your musical journey. Like a way to visualize and in
 
 1. Clone the repository
 ```bash
-git clone https://github.com/kavithahaima/Mudralaya.git
+git clone [https://github.com/kavithahaima/Mudralaya.git](https://github.com/kavithahk-1706/mudralaya.git)
 cd mudralaya
 ```
 
