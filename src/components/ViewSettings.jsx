@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { BsGear, BsX } from "react-icons/bs";
-import theme, { palettes } from "../utils/theme";
+import theme from "../utils/theme";
+import { PaletteOptions } from "./PalettePicker";
+import usePalette from "../hooks/usePalette";
 import { isTrailOn } from "../hooks/useViewSettings";
 
 // 3x3 picker: corners, sides, centre = fullscreen (top/bottom middle unused)
@@ -67,14 +69,15 @@ function Chip({ active, disabled, onClick, children, title }) {
 // mouse-only panel for palette, camera overlay + finger trail
 export default function ViewSettings({ viewSettings, updateViewSettings }) {
   const [open, setOpen] = useState(false);
+  usePalette(); // re-render on palette change
   const { cameraVisible, cameraPosition, cameraSize, cameraOpacity, cameraBlurPx } = viewSettings;
 
   return (
     <div className="fixed right-5 top-1/2 z-50 flex -translate-y-1/2 items-center gap-3">
       {open && (
         <div
-          className="flex w-64 flex-col gap-4 rounded-xl p-4 backdrop-blur-md"
-          style={{ background: theme.surface, border: `1px solid ${theme.line}` }}
+          className="flex w-80 flex-col gap-4 overflow-y-auto rounded-xl p-4 backdrop-blur-md"
+          style={{ background: theme.surface, border: `1px solid ${theme.line}`, maxHeight: `calc(100vh - ${2 * theme.barHeight + 24}px)` }}
         >
           <div className="flex items-center justify-between">
             <span className="text-base" style={{ color: theme.accent, fontFamily: theme.font }}>View</span>
@@ -84,25 +87,8 @@ export default function ViewSettings({ viewSettings, updateViewSettings }) {
             </button>
           </div>
 
-          <Row label="Palette" hint={theme.name}>
-            <div className="flex gap-2">
-              {Object.entries(palettes).map(([key, pal]) => (
-                <button
-                  key={key}
-                  type="button"
-      data-pinchable
-                  title={pal.name}
-                  aria-label={pal.name}
-                  onClick={() => updateViewSettings({ palette: key })}
-                  className="h-7 w-7 rounded-full p-0"
-                  style={{
-                    background: `conic-gradient(${pal.sthayi.mandra} 0 33%, ${pal.accent} 0 66%, ${pal.sthayi.tara} 0)`,
-                    border: `2px solid ${viewSettings.palette === key ? theme.ink : pal.bg}`,
-                    outline: `1px solid ${theme.lineSoft}`,
-                  }}
-                />
-              ))}
-            </div>
+          <Row label="Palette" hint={`${theme.name} · ${theme.mode}`}>
+            <PaletteOptions />
           </Row>
 
           <Row label="Camera">

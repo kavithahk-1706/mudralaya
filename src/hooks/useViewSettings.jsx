@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { applyPalette, DEFAULT_PALETTE } from "../utils/theme";
 
 const STORAGE_KEY = "mudralaya.viewSettings";
 
@@ -10,15 +9,12 @@ export const DEFAULT_VIEW_SETTINGS = {
   cameraOpacity: 0.2,
   cameraBlurPx: 5,
   trailEnabled: true,
-  palette: DEFAULT_PALETTE,
 };
 
 const loadSettings = () => {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    const settings = { ...DEFAULT_VIEW_SETTINGS, ...saved };
-    applyPalette(settings.palette);
-    return settings;
+    return { ...DEFAULT_VIEW_SETTINGS, ...saved };
   } catch {
     return DEFAULT_VIEW_SETTINGS;
   }
@@ -39,11 +35,7 @@ export default function useViewSettings() {
     }
   }, [viewSettings]);
 
-  const updateViewSettings = (changes) => {
-    // swap the palette before re-rendering so controls pick it up in the same render
-    if (changes.palette) applyPalette(changes.palette);
-    setViewSettings(prev => ({ ...prev, ...changes }));
-  };
+  const updateViewSettings = (changes) => setViewSettings(prev => ({ ...prev, ...changes }));
 
   return [viewSettings, updateViewSettings];
 }

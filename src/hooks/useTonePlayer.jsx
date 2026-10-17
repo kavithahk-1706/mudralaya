@@ -1,6 +1,13 @@
 import { useRef, useEffect, useCallback } from "react";
 import * as Tone from "tone";
 
+export const INSTRUMENT_SAMPLES = {
+  Veena: {"A4": "/assets/Veena_1_A.wav"},
+  Sitar: { "C4": "/assets/Sitar_1_C.wav" },
+  Flute: {"A#4": "/assets/Flute_2_Asharp.wav" },
+  Violin: {"G3":"/assets/Violin_1_G.wav"}
+};
+
 export default function useTonePlayer(selectedInstrument, basePitchShift = 0) {
     const samplerRef = useRef(null);
     const reverbRef = useRef(null);
@@ -9,13 +16,7 @@ export default function useTonePlayer(selectedInstrument, basePitchShift = 0) {
     const samplerLoadedRef = useRef(false);
     const prevInstrumentRef = useRef(null);
 
-    const instrumentSamples = {
-      Veena: {"A4": "/assets/Veena_1_A.wav"},
-      Sitar: { "C4": "/assets/Sitar_1_C.wav" },
-      Flute: {"A#4": "/assets/Flute_2_Asharp.wav" },
-      Violin: {"G3":"/assets/Violin_1_G.wav"}
-      
-    };
+    const instrumentSamples = INSTRUMENT_SAMPLES;
    
 
     useEffect(() => {
@@ -84,7 +85,7 @@ export default function useTonePlayer(selectedInstrument, basePitchShift = 0) {
     return playNote;
 }
 
-function getSwaraNote(swara, sthayi, basePitchShift = 0) {
+export function getSwaraNote(swara, sthayi, basePitchShift = 0) {
   const swaraMap = {
     "S": 0, "R1": 1, "R2": 2, "G1": 2,
     "G2": 3, "G3": 4, "M1": 5, "M2": 6,
@@ -110,4 +111,59 @@ function getSwaraNote(swara, sthayi, basePitchShift = 0) {
   
   const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
   return `${noteNames[finalSemitone]}${octave}`;
+}
+
+// playback of recordings: every note names its own instrument and pitch, so one sampler per
+// instrument is loaded on demand and they share a single effects chain
+export function useMultiInstrumentPlayer() {
+  const chainRef = useRef(null);
+  const samplersRef = useRef({});
+
+  useEffect(() => {
+    const samplers = samplersRef.current;
+    return () => {
+      Object.values(samplers).forEach(({ sampler }) => sampler.dispose());
+      chainRef.current?.delay.dispose();
+      chainRef.current?.reverb.dispose();
+      chainRef.current = null;
+      samplersRef.current = {};
+    };
+  }, []);
+
+  const getSampler = useCallback((instrument) => {
+    const name = INSTRUMENT_SAMPLES[instrument] ? instrument : "Veena";
+    if (samplersRef.current[name]) return samplersRef.current[name];
+
+    if (!chainRef.current) {
+      const reverb = new Tone.Reverb({ decay: 0.8, preDelay: 0.2, wet: 0.2 }).toDestination();
+      const delay = new Tone.FeedbackDelay({ delayTime: "8n", feedback: 0.3, wet: 0.25 }).connect(reverb);
+      chainRef.current = { reverb, delay };
+    }
+
+    const entry = { loaded: false, sampler: null };
+    entry.ready = new Promise((resolve) => {
+      entry.sampler = new Tone.Sampler({
+        urls: INSTRUMENT_SAMPLES[name],
+        baseUrl: "",
+        onload: () => { entry.loaded = true; resolve(); },
+        onerror: (error) => { console.error(`${name} sampler failed:`, error); resolve(); },
+      }).connect(chainRef.current.delay);
+    });
+    samplersRef.current[name] = entry;
+    return entry;
+  }, []);
+
+  // call from the click handler (audio needs a user gesture), then await before scheduling
+  const prepare = useCallback(async (instruments) => {
+    await Tone.start();
+    await Promise.all(instruments.map(i => getSampler(i).ready));
+  }, [getSampler]);
+
+  const playNote = useCallback((swara, sthayi, pitch, instrument) => {
+    const entry = getSampler(instrument);
+    if (!entry.loaded) return;
+    entry.sampler.triggerAttackRelease(getSwaraNote(swara, sthayi, pitch ?? 0), "2");
+  }, [getSampler]);
+
+  return { prepare, playNote };
 }

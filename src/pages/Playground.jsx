@@ -14,6 +14,7 @@ import useRecording from "../hooks/useRecording";
 import RecordButton from "../components/RecordButton";
 import ViewSettings from "../components/ViewSettings";
 import useViewSettings from "../hooks/useViewSettings";
+import usePalette from "../hooks/usePalette";
 import { ControlButton } from "../components/Controls";
 import { BsHouseDoor, BsCollectionPlay } from "react-icons/bs";
 import theme from "../utils/theme";
@@ -43,8 +44,12 @@ export default function Playground({
   const [homeButtonHoveredIndex, setHomeButtonHoveredIndex]=useState(null);
   const [recordingsPageButtonHoveredIndex, setRecordingsPageButtonHoveredIndex]=useState(null);
   const [recordButtonHoveredIndex, setRecordButtonHoveredIndex]=useState(null);
-  const { isRecording, duration, startRecording, recordSwara, stopRecording } = useRecording();
+  // read per note while recording, so mid-recording switches are kept
+  const recordingContextRef = useRef({});
+  recordingContextRef.current = { raga: selectedRaga, instrument: selectedInstrument, pitch: basePitchShift };
+  const { isRecording, duration, startRecording, recordSwara, stopRecording } = useRecording(() => recordingContextRef.current);
   const [viewSettings, updateViewSettings] = useViewSettings();
+  usePalette(); // re-render the themed controls when the palette changes
 
   //refs
   const homeButtonRef = useRef(null);
@@ -233,7 +238,7 @@ export default function Playground({
             return;
           }
           if (isRecordingRef.current) {
-            stopRecording(selectedRaga, selectedInstrument, basePitchShift);
+            stopRecording();
           } else {
             startRecording();
           }
@@ -358,7 +363,7 @@ export default function Playground({
             onLogin={handleLogin}
             user={user}
             onStartRecording={() => startRecording()}
-            onStopRecording={() => stopRecording(selectedRaga, selectedInstrument, basePitchShift)}
+            onStopRecording={() => stopRecording()}
             ref={recordButtonRef}
           />
         </div>

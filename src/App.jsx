@@ -5,14 +5,11 @@ import Home from './pages/Home';
 import Playground from './pages/Playground';
 import Recordings from './pages/Recordings';
 import Navbar from './components/NavBar';
-import useTonePlayer from './hooks/useTonePlayer';
 
 function App() {
   const [user, setUser] = useState(null);
   const [selectedInstrument, setSelectedInstrument] = useState("Veena");
   const [basePitchShift, setBasePitchShift]=useState(0);
-
-  const playNote = useTonePlayer(selectedInstrument, 0);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(setUser);
@@ -33,7 +30,7 @@ function App() {
             />} />
         <Route 
           path="/recordings" 
-          element={user ? <Recordings playNote={playNote} /> : <Navigate to="/" />} 
+          element={user ? <Recordings /> : <Navigate to="/" />} 
         />
       </Routes>
     </BrowserRouter>

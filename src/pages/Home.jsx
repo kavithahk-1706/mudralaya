@@ -1,149 +1,156 @@
 import { Link } from 'react-router-dom';
 import Navbar from '../components/NavBar';
-import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
+import ragaData from '../raga_details.json';
+import { BsPlayCircle, BsArrowRight } from 'react-icons/bs';
+
+const SUBSCRIPTS = '₀₁₂₃₄₅₆₇₈₉';
+const formatSwara = sw => sw.replace(/\d/g, d => SUBSCRIPTS[d]);
+const formatScale = swaras => swaras.map(formatSwara).join(' ');
+
+const instruments = ["Veena", "Sitar", "Flute", "Violin"];
+
+function SectionHeading({ children }) {
+  return <h2 className="serif text-3xl font-semibold mb-4" style={{ color: 'var(--ink)' }}>{children}</h2>;
+}
+
+function RagaGroup({ title, ragas }) {
+  return (
+    <div>
+      <h3 className="serif text-xl font-semibold mb-3" style={{ color: 'var(--accent)' }}>{title}</h3>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {ragas.map(raga => (
+          <div key={raga.name} className="card px-4 py-3">
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="serif font-semibold">{raga.name}</span>
+              {raga.parent && <span className="text-xs truncate" style={{ color: 'var(--ink-soft)' }}>{raga.parent}</span>}
+            </div>
+            <div className="text-xs mt-1 serif" style={{ color: 'var(--ink-soft)' }}>
+              ↑ {formatScale(raga.arohana)}<br />
+              ↓ {formatScale(raga.avarohana)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
-  const ragas = [
-    "Mayamalavagowla", "Shankarabharanam", "Kalyani", "Harikambhoji",
-    "Mohana", "Hamsadhwani", "Malahari", "Hindolam", "Arabhi",
-    "Shuddha Saveri", "Niroshta"
-  ];
-
-  const instruments = ["Veena", "Sitar", "Flute", "Violin"];
+  const melakartas = ragaData.filter(r => r.type === 'Melakarta');
+  const janyas = ragaData.filter(r => r.type !== 'Melakarta');
 
   return (
     <>
       <Navbar />
-      <div id="home" className="min-h-screen bg-gradient-to-br from-purple-500/90 via-cyan-500/95 to-teal-400/90 p-12 pt-28">
-        <div className="min-w-4xl mx-auto bg-white/95 rounded-2xl shadow-2xl p-16">
-          
+      <div id="home" className="page px-6 pt-28 pb-20">
+        <div className="max-w-4xl mx-auto">
+
           {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl mb-4 p-3 bg-gradient-to-r from-purple-600 to-teal-500 bg-clip-text text-transparent font-bold">
-              Welcome to मुद्रालय (Mudralaya)!
+          <header className="text-center mb-16">
+            <h1 className="serif text-5xl font-semibold mb-4 leading-tight">
+              Welcome to <span style={{ color: 'var(--accent)' }}>मुद्रालय</span>!
             </h1>
-            
-            <div className="bg-gradient-to-r from-purple-500/5 to-teal-500/5 border border-cyan-500/20 rounded-lg p-5 min-w-2xl mx-auto mt-6">
-              <p className="text-gray-600 text-sm leading-relaxed">
-                In Sanskrit, <strong>Mudra</strong> (मुद्रा) means gesture, and <strong>Laya</strong> (लय) means rhythm/music. <br/>
-                Put them together and you get <strong>Mudralaya</strong> (मुद्रालय), which can also be interpreted as a "temple of gestures". <br/>
-                In other words, a space where your hand movements turn into music.
-              </p>
+            <p className="text-lg mb-8" style={{ color: 'var(--ink-soft)' }}>
+              MudraLaya: a space where your hand movements turn into music.
+            </p>
+
+            <div className="flex flex-wrap justify-center gap-3 mb-10">
+              <Link to="/playground" className="btn btn-primary" style={{ height: '3rem', padding: '0 1.75rem', fontSize: '1rem' }}>
+                Try it out <BsArrowRight />
+              </Link>
+              <a
+                href="https://youtu.be/SKOpkNU-Cac"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn"
+                style={{ height: '3rem', padding: '0 1.5rem', fontSize: '1rem' }}
+              >
+                <BsPlayCircle style={{ color: 'var(--accent)' }} /> Watch a quick demo
+              </a>
             </div>
-          </div>
+
+            <div className="card p-6 text-sm leading-relaxed text-left sm:text-center" style={{ color: 'var(--ink-soft)' }}>
+              In Sanskrit, <strong style={{ color: 'var(--ink)' }}>Mudra</strong> (मुद्रा) means gesture, and <strong style={{ color: 'var(--ink)' }}>Laya</strong> (लय) means rhythm/music. <br />
+              Put them together and you get <strong style={{ color: 'var(--ink)' }}>Mudralaya</strong> (मुद्रालय), which can also be interpreted as a "temple of gestures". <br />
+              In other words, a space where your hand movements turn into music.
+            </div>
+          </header>
 
           {/* How to use */}
-          <section className="mb-10">
-            <h2 className="text-3xl mb-4 text-gray-800 font-bold">How to use</h2>
-            <ol className="list-decimal list-inside space-y-2 text-gray-700 leading-relaxed">
-              <li>Allow camera access (we use MediaPipe for hand tracking)</li>
-              <li>Put your hand in front of the camera (make sure all fingers are visible)</li>
-              <li>Move your hand over the swara circles to hover over them</li>
-              <li>Pinch your thumb and index finger to actually play the note</li>
-              <li>Use your mouse/hand to select different ragas/instruments/pitches from the dropdown menus</li>
-              <li><strong>Login with Google</strong> to unlock <strong>recording and playback</strong></li>
+          <section className="mb-16">
+            <SectionHeading>How to use</SectionHeading>
+            <ol className="space-y-3 leading-relaxed list-none p-0 m-0">
+              {[
+                'Allow camera access (we use MediaPipe for hand tracking).',
+                'Put your hand in front of the camera, with all fingers visible.',
+                'Move your index finger over the swaras on the chakra to hover over them. A glowing trail follows your fingertip.',
+                'Pinch your thumb and index finger to play a note. Keep pinching and slide to play the next swara.',
+                'Pick ragas, instruments and pitch from the menus at the top, by mouse or by pinching over them.',
+                'Use the gear button to show or hide the camera, move it around, and change the palette.',
+                <><strong>Login with Google</strong> to unlock <strong>recording and playback</strong>.</>,
+              ].map((step, i) => (
+                <li key={i} className="flex gap-4">
+                  <span
+                    className="serif shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold"
+                    style={{ border: '1px solid var(--line)', color: 'var(--accent)' }}
+                  >
+                    {i + 1}
+                  </span>
+                  <span className="pt-1" style={{ color: 'var(--ink-soft)' }}>{step}</span>
+                </li>
+              ))}
             </ol>
           </section>
 
           {/* What's included */}
-          <section id="whats-included" className="mb-10">
-            <h2 className="text-3xl mb-1 text-gray-800 font-bold">What's in here (more on the way!)</h2>
-            <div className="text-gray-700 leading-relaxed mb-6">
-              <p className="mb-3 mt-3">
-                The swara circles light up when you hover and get brighter when you play them. Each raga has its own <i>arohana</i> (ascending) and <i>avarohana</i> (descending) patterns that decide what <i>swaras</i> (notes) can be played in it.
+          <section id="whats-included" className="mb-16 scroll-mt-24">
+            <SectionHeading>What's in here (more on the way!)</SectionHeading>
+            <div className="leading-relaxed mb-8 space-y-3" style={{ color: 'var(--ink-soft)' }}>
+              <p>
+                The swaras sit on a chakra: madhya sthayi in the middle ring, tara on the outer ring and mandra on the inner ring. A dot above a swara (Ṡ) marks tara sthayi and a dot below (Ṣ) marks mandra.
+                Each raga has its own <i>arohana</i> (ascending) and <i>avarohana</i> (descending) patterns that decide which <i>swaras</i> (notes) can be played next.
               </p>
               <p>
                 You can switch between instruments to hear different timbres, adjust the base pitch if you want to sing along, and record your sessions to listen back later.
               </p>
             </div>
 
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-2xl mb-3 text-gray-800 font-bold">Currently Available Ragas</h3>
-                <ul className="list-disc list-inside text-gray-700 leading-relaxed columns-2 gap-4">
-                  {ragas.map(raga => <li key={raga}>{raga}</li>)}
-                </ul>
-              </div>
+            <div className="space-y-10">
+              <RagaGroup title={`Melakarta ragas (${melakartas.length})`} ragas={melakartas} />
+              <RagaGroup title={`Janya ragas (${janyas.length})`} ragas={janyas} />
 
               <div>
-                <h3 className="text-2xl mb-3 text-gray-800 font-bold">Currently Available Instruments</h3>
-                <ul className="list-disc list-inside text-gray-700 leading-relaxed">
-                  {instruments.map(inst => <li key={inst}>{inst}</li>)}
-                </ul>
+                <h3 className="serif text-xl font-semibold mb-3" style={{ color: 'var(--accent)' }}>Instruments</h3>
+                <div className="flex flex-wrap gap-2">
+                  {instruments.map(inst => (
+                    <span key={inst} className="card px-4 py-2 text-sm">{inst}</span>
+                  ))}
+                </div>
               </div>
             </div>
           </section>
 
           {/* Disclaimer */}
-          <div className="bg-gradient-to-r from-purple-500/10 to-teal-500/10 border-2 border-cyan-500/30 rounded-lg p-6 mb-10">
-            <h3 className="text-xl text-gray-800 mt-0 mb-2 font-bold">Quick note</h3>
-            <p className="text-gray-600 leading-relaxed m-0">
-              This is just a playground and learning tool, not a substitute for actual practice with a guru. 
-              You can use it to get familiar with how ragas work, try out different patterns, but it <strong>cannot replace actual learning</strong>.
+          <div className="card p-6 mb-16" style={{ borderLeft: '3px solid var(--accent)' }}>
+            <h3 className="serif text-xl font-semibold mt-0 mb-2">Quick note</h3>
+            <p className="leading-relaxed m-0" style={{ color: 'var(--ink-soft)' }}>
+              This is just a playground and learning tool, not a substitute for actual practice with a guru.
+              You can use it to get familiar with how ragas work, try out different patterns, but it <strong style={{ color: 'var(--ink)' }}>cannot replace actual learning</strong>.
             </p>
           </div>
 
           {/* CTA */}
           <div className="text-center">
-            <div className="mb-6 hover:scale-110 duration-200 font-medium">
-              <a 
-                href="https://youtu.be/SKOpkNU-Cac" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="hover:opacity-80 transition-opacity"
-              >
-                <span className="font-semibold bg-gradient-to-r from-purple-600 to-teal-500 bg-clip-text text-transparent">
-                  Watch a quick demo →
-                </span>
-              </a>
-            </div>
-          </div>          
-          <div className="text-center">
-            <Link to="/playground">
-              <button className="px-12 py-4 border-none text-lg bg-gradient-to-r from-purple-600/90 to-teal-500/90 text-white rounded-xl font-semibold hover:scale-110 transition-transform duration-200">
-                Try it out
-              </button>
+            <Link to="/playground" className="btn btn-primary" style={{ height: '3rem', padding: '0 2rem', fontSize: '1rem' }}>
+              Try it out <BsArrowRight />
             </Link>
-
-          {/* Contact Links */}
-          <div className="text-center m-10">
-            <h3 className="text-2xl mb-4 text-gray-800 font-bold">Connect with me</h3>
-            <div className="flex justify-center gap-6">
-              <a 
-                href="https://www.linkedin.com/in/kavitha-haima-kidambi-615791353" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-purple-600 hover:text-purple-700 transition-colors duration-200"
-              >
-                <FaLinkedin className="w-10 h-10 bg-gradient-to-r from-purple-600/90 to-teal-500/90 text-white rounded-sm hover:scale-110 transition-transform duration-200" />
-              </a>
-              <a 
-                href="https://github.com/kavithahk-1706" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-700 hover:text-gray-900 transition-colors duration-200"
-              >
-                <FaGithub className="w-10 h-10  bg-gradient-to-r from-purple-600/90 to-teal-500/90  text-white rounded-3xl hover:scale-110 transition-transform duration-200" />
-              </a>
-              <a 
-                href="mailto:kavithahaimakidambi0613@gmail.com" 
-                className="text-teal-600 hover:text-teal-700 transition-colors duration-200"
-              >
-                <FaEnvelope className="w-10 h-10 hover:scale-110 bg-gradient-to-r from-purple-600/90 to-teal-500/90 text-white rounded-lg px-1 transition-transform duration-200" />
-              </a>
-            </div>
-          </div>
-            <p className="mt-4 text-gray-500 text-sm">
+            <p className="mt-4 text-sm" style={{ color: 'var(--ink-soft)' }}>
               Browser-based. No installation required.
             </p>
           </div>
-          
-          {/*Footer*/}
-          <div className="text-center mt-12 pt-8 border-t border-gray-200">
-            <p className="text-gray-600 text-sm">
-              <em>Built with love and devotion by <a href="https://www.linkedin.com/in/kavitha-haima-kidambi-615791353" target="_blank"><span className="font-semibold bg-gradient-to-r from-purple-600 to-teal-500 bg-clip-text text-transparent">Kavitha Haima Kidambi</span></a></em>
-            </p>
-          </div>
+
+          {/* Footer */}
+          <div className="text-center mt-16 pt-8" style={{ borderTop: '1px solid var(--line-soft)' }} />
         </div>
       </div>
     </>
