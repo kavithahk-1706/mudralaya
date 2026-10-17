@@ -57,7 +57,7 @@ It's more of a companion to your musical journey. Like a way to visualize and in
 
 1. Clone the repository
 ```bash
-git clone https://github.com/kavithahaima/Mudralaya.git
+git clone https://github.com/kavithahk-1706/mudralaya.git
 cd mudralaya
 ```
 
@@ -163,5 +163,6 @@ Built with love and devotion for Krishna and Maa Saraswathi
 ---
 
 ## Demo
-![Mudralaya Demo](add link here later)
+[Mudralaya Demo](https://www.youtube.com/watch?v=SKOpkNU-Cac&feature=youtu.be)
+
 
