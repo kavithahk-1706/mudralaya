@@ -28,6 +28,8 @@ ol {
 ul {
   list-style-type: disc;
 }
+/* vite starter defaults, layered so tailwind utilities can override them */
+@layer base {
 a {
   font-weight: 500;
   color: #646cff;
@@ -74,6 +76,7 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
 }
 
 body, html {

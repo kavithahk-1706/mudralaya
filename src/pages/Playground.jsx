@@ -12,6 +12,11 @@ import { auth, googleProvider } from '../firebase';
 import { signInWithPopup } from 'firebase/auth';
 import useRecording from "../hooks/useRecording";
 import RecordButton from "../components/RecordButton";
+import ViewSettings from "../components/ViewSettings";
+import useViewSettings from "../hooks/useViewSettings";
+import { ControlButton } from "../components/Controls";
+import { BsHouseDoor, BsCollectionPlay } from "react-icons/bs";
+import theme from "../utils/theme";
 
 export default function Playground({
   user,
@@ -39,12 +44,12 @@ export default function Playground({
   const [recordingsPageButtonHoveredIndex, setRecordingsPageButtonHoveredIndex]=useState(null);
   const [recordButtonHoveredIndex, setRecordButtonHoveredIndex]=useState(null);
   const { isRecording, duration, startRecording, recordSwara, stopRecording } = useRecording();
+  const [viewSettings, updateViewSettings] = useViewSettings();
 
   //refs
   const homeButtonRef = useRef(null);
   const recordingsButtonRef = useRef(null);
   const recordButtonRef=useRef(null);
-  const lastPlayedSwaraRef = useRef(null); 
   const instrumentDropdownRef = useRef(null);
   const instrumentOptionsRef = useRef(null);
   const instrumentDropdownOpenRef=useRef(null);
@@ -62,6 +67,7 @@ export default function Playground({
   const pitchHoveredIndexRef = useRef(null);
   const isRecordingRef = useRef(isRecording);
   const userRef = useRef(user);
+  const viewSettingsRef = useRef(viewSettings);
 
 
   //function to format duration of recording
@@ -95,8 +101,12 @@ export default function Playground({
           screenX >= optionsRect.left && screenX <= optionsRect.right &&
           screenY >= optionsRect.top && screenY <= optionsRect.bottom) {
         
-        const optionHeight = optionsRect.height / options.length;
-        const hoveredIndex = Math.floor((screenY - optionsRect.top) / optionHeight);
+        // options are laid out row by row in a grid of data-columns columns
+        const columns = Number(optionsRef.current.dataset.columns || 1);
+        const rows = Math.ceil(options.length / columns);
+        const row = Math.floor((screenY - optionsRect.top) / (optionsRect.height / rows));
+        const col = Math.floor((screenX - optionsRect.left) / (optionsRect.width / columns));
+        const hoveredIndex = row * columns + col;
                 
         if (hoveredIndex >= 0 && hoveredIndex < options.length && hoveredIndex !== hoveredIndexRef.current) {
           hoveredIndexRef.current = hoveredIndex;
@@ -104,7 +114,7 @@ export default function Playground({
         }
 
         // check pinch selection while hovering
-        if (isPinching && !wasPinching) {
+        if (isPinching && !wasPinching && hoveredIndex >= 0 && hoveredIndex < options.length) {
           onSelect(options[hoveredIndex]);
           setOpen(false);
           hoveredIndexRef.current = null;
@@ -252,9 +262,14 @@ export default function Playground({
     userRef.current = user;
   }, [user]);
 
+  useEffect(() => {
+    viewSettingsRef.current = viewSettings;
+  }, [viewSettings]);
+
   //call the main hand tracking hook/
   useHandTracking({
     selectedRagaRef,
+    viewSettingsRef,
     vidRef,
     canvasRef,
     playNote,
@@ -267,120 +282,87 @@ export default function Playground({
   
   return (
     <div style={{ position: 'relative' }}>
-      <video ref={vidRef} style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', border: '2px solid black' }} />
-      <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', border: '1px solid black' }} />
+      {/* mediapipe reads frames from the video; the user only ever sees the canvas */}
+      <video ref={vidRef} playsInline muted style={{ position: 'absolute', top: 0, left: 0, width: 1, height: 1, opacity: 0, pointerEvents: 'none' }} />
+      <canvas ref={canvasRef} style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh' }} />
 
-      <InstrumentDropdown
-        selectedInstrument={selectedInstrument}
-        setSelectedInstrument={setSelectedInstrument}
-        dropdownOpen={instrumentDropdownOpen}
-        setDropdownOpen={setInstrumentDropdownOpen}
-        dropdownRef={instrumentDropdownRef}
-        optionsRef={instrumentOptionsRef}
-        hoveredOptionIndex={instrumentHoveredIndex}     
-        setHoveredOptionIndex={setInstrumentHoveredIndex}
-      />
+      <ViewSettings viewSettings={viewSettings} updateViewSettings={updateViewSettings} />
 
-      <BasePitchDropdown
-        basePitchShift={basePitchShift}
-        setBasePitchShift={setBasePitchShift}
-        dropdownOpen={pitchDropdownOpen}
-        setDropdownOpen={setPitchDropdownOpen}
-        dropdownRef={pitchDropdownRef}
-        optionsRef={pitchOptionsRef}
-        hoveredOptionIndex={pitchHoveredIndex}
-        setHoveredOptionIndex={setPitchHoveredIndex}
-    />
+      {/* controls float in two slim bars that fade into the canvas instead of boxing it in */}
+      <div
+        className="fixed inset-x-0 top-0 z-40 flex items-center gap-3 px-4"
+        style={{ height: theme.barHeight, background: `linear-gradient(to bottom, ${theme.bg}, transparent)` }}
+      >
+        <RagaDropdown
+          selectedRaga={selectedRaga}
+          setSelectedRaga={setSelectedRaga}
+          dropdownOpen={dropdownOpen}
+          setDropdownOpen={setDropdownOpen}
+          dropdownRef={dropdownRef}
+          optionsRef={optionsRef}
+          hoveredOptionIndex={ragaHoveredIndex}
+          setHoveredOptionIndex={setRagaHoveredIndex}
+        />
 
-      <RagaDropdown
-        selectedRaga={selectedRaga}
-        setSelectedRaga={setSelectedRaga}
-        dropdownOpen={dropdownOpen}
-        setDropdownOpen={setDropdownOpen}
-        dropdownRef={dropdownRef}
-        optionsRef={optionsRef}
-        hoveredOptionIndex={ragaHoveredIndex}     
-        setHoveredOptionIndex={setRagaHoveredIndex}
-      />
-
-      <div className="flex">
-
-      <Link to="/">
-      <button ref={homeButtonRef} style={{
-          position: 'absolute',
-          top:575,
-          left: 25,
-          padding: '8px',
-          fontSize: '25px',
-          color: '#ffffffff',
-          background: `linear-gradient(45deg, hsla(271, 65%, 52%, 0.88), hsla(165, 75%, 50%, 0.9))`,
-          borderRadius: '10px',
-          border:'none',
-          cursor: 'pointer',
-          minWidth: '250px'
-        }}
-          
-          onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-          onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-          >
-            Back to Home
-        </button>
-      </Link>
-
-      <Link to="/recordings">
-        <button ref={recordingsButtonRef} style={{
-          position: 'absolute',
-          top: 575,
-          left: 650,
-          padding: '8px',
-          fontSize: '25px',
-          color: '#ffffffff',
-          background: `linear-gradient(45deg, hsla(271, 65%, 52%, 0.88), hsla(165, 75%, 50%, 0.9))`,
-          borderRadius: '10px',
-          border: 'none',
-          cursor: 'pointer',
-          minWidth: '250px'
-        }}
-        onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-        >
-          View Recordings
-        </button>
-      </Link>      
-
-  
-      <div onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'} onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}>
-         <RecordButton 
-              isRecording={isRecording}
-              onLogin={handleLogin}
-              user={user}
-              onStartRecording={() => startRecording()}
-              onStopRecording={() => stopRecording(selectedRaga, selectedInstrument, basePitchShift)}
-              ref={recordButtonRef}
+        <div className="ml-auto flex items-center gap-3">
+          <InstrumentDropdown
+            selectedInstrument={selectedInstrument}
+            setSelectedInstrument={setSelectedInstrument}
+            dropdownOpen={instrumentDropdownOpen}
+            setDropdownOpen={setInstrumentDropdownOpen}
+            dropdownRef={instrumentDropdownRef}
+            optionsRef={instrumentOptionsRef}
+            hoveredOptionIndex={instrumentHoveredIndex}
+            setHoveredOptionIndex={setInstrumentHoveredIndex}
           />
-        {isRecording && (
-          <div style={{
-            position: 'fixed', 
-            bottom: 75,
-            right: 375,
-            color: 'white',
-            fontSize: '24px',
-            fontWeight: '600',
-            textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-            zIndex: 1000
-          }}>
-            {formatDuration(duration)}
-          </div>
-        )}   
 
-
+          <BasePitchDropdown
+            basePitchShift={basePitchShift}
+            setBasePitchShift={setBasePitchShift}
+            dropdownOpen={pitchDropdownOpen}
+            setDropdownOpen={setPitchDropdownOpen}
+            dropdownRef={pitchDropdownRef}
+            optionsRef={pitchOptionsRef}
+            hoveredOptionIndex={pitchHoveredIndex}
+            setHoveredOptionIndex={setPitchHoveredIndex}
+          />
         </div>
-    
       </div>
-   
-      
 
-    
+      <div
+        className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 px-4"
+        style={{ height: theme.barHeight, background: `linear-gradient(to top, ${theme.bg}, transparent)` }}
+      >
+        <Link to="/">
+          <ControlButton ref={homeButtonRef}>
+            <BsHouseDoor style={{ color: theme.accent }} />
+            Home
+          </ControlButton>
+        </Link>
+
+        <Link to="/recordings">
+          <ControlButton ref={recordingsButtonRef}>
+            <BsCollectionPlay style={{ color: theme.accent }} />
+            Recordings
+          </ControlButton>
+        </Link>
+
+        <div className="ml-auto flex items-center gap-3">
+          {isRecording && (
+            <span className="text-sm tabular-nums" style={{ color: theme.vermilion }}>
+              ● {formatDuration(duration)}
+            </span>
+          )}
+          <RecordButton
+            isRecording={isRecording}
+            onLogin={handleLogin}
+            user={user}
+            onStartRecording={() => startRecording()}
+            onStopRecording={() => stopRecording(selectedRaga, selectedInstrument, basePitchShift)}
+            ref={recordButtonRef}
+          />
+        </div>
+      </div>
     </div>
   )
 }

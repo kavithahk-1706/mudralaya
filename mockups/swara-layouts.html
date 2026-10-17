@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Swara Layout Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500&family=Noto+Serif:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #0d0b1e; --ink: #f3ead8; --accent: #e9b44c; --line: rgba(233,180,76,.35); --surface: rgba(255,255,255,.035); }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Noto Sans", system-ui, sans-serif; transition: background .3s, color .3s; }
+  header { padding: 20px 24px 8px; display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between; }
+  h1 { font-family: "Noto Serif", serif; font-weight: 600; font-size: 22px; margin: 0; }
+  .sub { opacity: .65; font-size: 13px; margin: 4px 0 0; max-width: 64ch; line-height: 1.5; }
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .seg { display: flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .seg button { background: transparent; color: var(--ink); border: 0; padding: 8px 12px; font: inherit; font-size: 13px; cursor: pointer; display: flex; gap: 8px; align-items: center; }
+  .seg button.on { background: var(--accent); color: var(--bg); }
+  .dots { display: inline-flex; }
+  .dots i { width: 10px; height: 10px; border-radius: 50%; margin-left: -3px; box-shadow: 0 0 0 1px rgba(0,0,0,.35); }
+  select, .btn { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font: inherit; font-size: 13px; cursor: pointer; }
+  select option { background: var(--bg); }
+  .hint { padding: 0 24px; font-size: 12.5px; opacity: .6; margin: 4px 0 0; }
+  main { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 16px; padding: 14px 24px 32px; }
+  .card { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--surface); }
+  .meta { padding: 12px 16px 10px; display: flex; flex-direction: column; gap: 4px; }
+  .meta h2 { font-family: "Noto Serif", serif; font-size: 16px; font-weight: 600; margin: 0; }
+  .meta p { margin: 0; font-size: 12.5px; opacity: .72; line-height: 1.5; }
+  canvas { display: block; width: 100%; aspect-ratio: 5 / 4; cursor: crosshair; }
+  @media (max-width: 520px) { header, main { padding-left: 16px; padding-right: 16px; } .hint { padding: 0 16px; } }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Swara layout + palette mockup</h1>
+    <p class="sub">Four layouts for the same raga, in the palette you pick. Move over a layout to see the finger trail and hover, and click to "play" a swara. Unreachable swaras then grey out by arohana/avarohana, same rule as the app.</p>
+  </div>
+  <div class="controls">
+    <div class="seg" id="palettes"></div>
+    <select id="raga" aria-label="Raga"></select>
+    <button class="btn" id="reset" type="button">Reset</button>
+  </div>
+</header>
+<p class="hint">Notation: dot below = mandra (Ṣ), no dot = madhya, dot above = tara (Ṡ).</p>
+<main id="cards"></main>
+
+<script>
+const RAGAS = [{"name":"Mayamalavagowla","arohana":["S","R1","G3","M1","P","D1","N3","S"],"avarohana":["S","N3","D1","P","M1","G3","R1","S"]},{"name":"Shankarabharanam","arohana":["S","R2","G3","M1","P","D2","N3","S"],"avarohana":["S","N3","D2","P","M1","G3","R2","S"]},{"name":"Kalyani","arohana":["S","R2","G3","M2","P","D2","N3","S"],"avarohana":["S","N3","D2","P","M2","G3","R2","S"]},{"name":"Harikambhoji","arohana":["S","R2","G3","M1","P","D2","N2","S"],"avarohana":["S","N2","D2","P","M1","G3","R2","S"]},{"name":"Mohana","arohana":["S","R2","G3","P","D2","S"],"avarohana":["S","D2","P","G3","R2","S"]},{"name":"Hamsadhwani","arohana":["S","R2","G3","P","N3","S"],"avarohana":["S","N3","P","G3","R2","S"]},{"name":"Malahari","arohana":["S","R1","M1","P","D1","S"],"avarohana":["S","D1","P","M1","G3","R1","S"]},{"name":"Hindolam","arohana":["S","G2","M1","D1","N2","S"],"avarohana":["S","N2","D1","M1","G2","S"]},{"name":"Arabhi","arohana":["S","R2","M1","P","D2","S"],"avarohana":["S","N3","D2","P","M1","G3","R2","S"]},{"name":"Shuddha Saveri","arohana":["S","R2","M1","P","D2","S"],"avarohana":["S","D2","P","M1","R2","S"]},{"name":"Niroshta","arohana":["S","R2","G3","D2","N3","S"],"avarohana":["S","N3","D2","G3","R2","S"]}];
+
+const ORDER = ["S","R1","R2","G2","G3","M1","M2","P","D1","D2","N2","N3"];
+const POS = { S:0, R1:1, R2:2, G2:3, G3:4, M1:5, M2:6, P:7, D1:8, D2:9, N2:10, N3:11 };
+const OCT = { mandra: -12, madhya: 0, tara: 12 };
+const absPos = (sw, st) => POS[sw] + OCT[st];
+
+const PALETTES = {
+  lamp: { name: "Night + lamp gold", bg: "#0d0b1e", ink: "#f3ead8", accent: "#e9b44c", flare: "#f28c28",
+    line: "rgba(233,180,76,.35)", guide: "rgba(233,180,76,.16)", muted: "rgba(160,155,175,.32)",
+    sthayi: { mandra: "#8f7cf0", madhya: "#e9b44c", tara: "#f6dc9a" }, trail: ["#5b4bd6", "#f2c46b"] },
+  copper: { name: "Ink + copper/peacock", bg: "#0a0f11", ink: "#e8e2d6", accent: "#c8794a", flare: "#f0a86c",
+    line: "rgba(200,121,74,.4)", guide: "rgba(47,165,154,.2)", muted: "rgba(150,165,165,.3)",
+    sthayi: { mandra: "#2fa59a", madhya: "#c8794a", tara: "#ecc09a" }, trail: ["#1f6f6a", "#f0a86c"] },
+  lotus: { name: "Plum + lotus", bg: "#170d1b", ink: "#f6e9ee", accent: "#e07a8f", flare: "#ffb3a7",
+    line: "rgba(224,122,143,.4)", guide: "rgba(224,122,143,.16)", muted: "rgba(175,150,165,.3)",
+    sthayi: { mandra: "#6fb5a2", madhya: "#e07a8f", tara: "#f3c1c9" }, trail: ["#3e7f73", "#f3c1c9"] },
+  peacock: { name: "Peacock night", bg: "#071a1d", ink: "#eaf2ec", accent: "#d9b25f", flare: "#f5d58a",
+    line: "rgba(217,178,95,.35)", guide: "rgba(64,170,160,.2)", muted: "rgba(150,170,170,.3)",
+    sthayi: { mandra: "#3aa59b", madhya: "#d9b25f", tara: "#a8d8c8" }, trail: ["#1f5f66", "#f5d58a"] },
+  ivory: { name: "Ivory + vermilion (light)", bg: "#f4eee2", ink: "#2a1e14", accent: "#b5452f", flare: "#d9622b",
+    line: "rgba(181,69,47,.35)", guide: "rgba(120,80,40,.18)", muted: "rgba(90,80,70,.3)",
+    sthayi: { mandra: "#4b5ea8", madhya: "#b5452f", tara: "#c48a1c" }, trail: ["#4b5ea8", "#d9622b"] },
+};
+
+const state = { palette: "lamp", raga: RAGAS[0], current: null, played: null };
+
+// same sthayi subsets as drawSwaraRows in the app
+function ragaSwaras(r) {
+  const set = new Set([...r.arohana, ...r.avarohana]);
+  const madhya = ORDER.filter(s => set.has(s));
+  const tara = madhya.slice(0, Math.ceil(madhya.length / 2) + 1);
+  const mandra = r.avarohana.slice(1, Math.ceil(r.avarohana.length / 2) + 1);
+  return { set, madhya, tara, mandra,
+    all: [...mandra.map(s => [s, "mandra"]), ...madhya.map(s => [s, "madhya"]), ...tara.map(s => [s, "tara"])] };
+}
+
+function reachable(cur, sw, st, r) {
+  if (!cur) return true;
+  const a = absPos(cur.swara, cur.sthayi), b = absPos(sw, st);
+  if (a === b) return true;
+  return b > a ? r.arohana.includes(sw) : r.avarohana.includes(sw);
+}
+
+const SUBS = "₀₁₂₃₄₅₆₇₈₉";
+function swaraLabel(sw, st) {
+  const letter = sw.match(/[A-Z]+/)[0];
+  const num = sw.match(/\d+/)?.[0];
+  const dot = st === "tara" ? "̇" : st === "mandra" ? "̣" : "";
+  return letter + dot + (num ? SUBS[+num] : "");
+}
+
+const rgba = (hex, a) => {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
+};
+
+// S at the bottom, rising up the left side (clockwise on screen), 30° per semitone
+const ANG = k => Math.PI / 2 + k * Math.PI / 6;
+const wrap = a => Math.atan2(Math.sin(a), Math.cos(a));
+
+function contains(g, x, y) {
+  if (g.type === "circle") return Math.hypot(x - g.x, y - g.y) <= g.r;
+  const d = Math.hypot(x - g.cx, y - g.cy);
+  if (d < g.r0 || d > g.r1) return false;
+  return Math.abs(wrap(Math.atan2(y - g.cy, x - g.cx) - g.a)) <= g.half;
+}
+
+function sector(cx, cy, rMid, thick, a, half) {
+  return { type: "sector", cx, cy, r0: rMid - thick / 2, r1: rMid + thick / 2, a, half,
+    lx: cx + Math.cos(a) * rMid, ly: cy + Math.sin(a) * rMid };
+}
+
+function span(cx, cy, r0, r1, a, half) {
+  const rMid = (r0 + r1) / 2;
+  return { type: "sector", cx, cy, r0, r1, a, half, lx: cx + Math.cos(a) * rMid, ly: cy + Math.sin(a) * rMid };
+}
+
+// folded layouts: madhya runs anticlockwise from S at the bottom, turns back at Ṡ, and tara runs
+// clockwise on the outer ring. Each sthayi folds back alongside the previous one, so swaras across a
+// boundary stay neighbours but sit on separate rings.
+// mandra: "parallel" runs alongside madhya on the inner ring (Ṇ beside R, Ḍ beside G...),
+//         "opposite" continues clockwise from S on the inner ring.
+function foldedLayout(mandraDir) {
+  return function build(W, H, rs) {
+    const S = Math.min(W, H), cx = W / 2, cy = H / 2;
+    const step = Math.PI / 9; // 20° per semitone so a full sthayi (12 steps) spans 240°
+    const th = k => Math.PI / 2 - k * step; // k > 0 = anticlockwise from the bottom
+    const R = { mandra: S * 0.19, madhya: S * 0.315, tara: S * 0.44 };
+    const t = S * 0.1, half = step * 0.44;
+    const regions = [];
+
+    rs.madhya.forEach(sw => {
+      const k = POS[sw];
+      // S is the hinge with mandra: it spans both inner rings
+      regions.push({ sw, st: "madhya", ...(k === 0
+        ? span(cx, cy, R.mandra - t / 2, R.madhya + t / 2, th(0), half)
+        : sector(cx, cy, R.madhya, t, th(k), half)) });
+    });
+    rs.tara.forEach(sw => {
+      const j = POS[sw];
+      // Ṡ is the hinge with madhya; tara mirrors back over madhya
+      regions.push({ sw, st: "tara", ...(j === 0
+        ? span(cx, cy, R.madhya - t / 2, R.tara + t / 2, th(12), half)
+        : sector(cx, cy, R.tara, t, th(12 - j), half)) });
+    });
+    rs.mandra.forEach(sw => {
+      const j = 12 - POS[sw]; // semitones below S
+      regions.push({ sw, st: "mandra", ...sector(cx, cy, R.mandra, t, mandraDir === "parallel" ? th(j) : th(-j), half) });
+    });
+
+    const maxTara = Math.max(0, ...rs.tara.map(sw => POS[sw]));
+    const maxMandra = Math.max(1, ...rs.mandra.map(sw => 12 - POS[sw]));
+    const decor = (ctx, pal) => {
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = pal.guide;
+      const arc = (r, a0, a1) => { ctx.beginPath(); ctx.arc(cx, cy, r, a0, a1); ctx.stroke(); };
+      arc(R.madhya, th(12), th(0));
+      arc(R.tara, th(12), th(12 - maxTara));
+      if (mandraDir === "parallel") arc(R.mandra, th(maxMandra), th(0));
+      else arc(R.mandra, th(0), th(-maxMandra));
+      // hairpins at the two hinges
+      [[th(12), R.madhya, R.tara], [th(0), R.mandra, R.madhya]].forEach(([a, r0, r1]) => {
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(a) * r0, cy + Math.sin(a) * r0);
+        ctx.lineTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
+        ctx.stroke();
+      });
+    };
+    return { regions, decor, hub: { x: cx, y: cy, r: S * 0.11 } };
+  };
+}
+
+function ticks(ctx, cx, cy, r0, r1, angleOf, set, pal) {
+  ORDER.forEach(sw => {
+    const a = angleOf(POS[sw]);
+    ctx.strokeStyle = set.has(sw) ? pal.guide : rgba(pal.ink, .07);
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(a) * r0, cy + Math.sin(a) * r0);
+    ctx.lineTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
+    ctx.stroke();
+  });
+}
+
+const LAYOUTS = [
+  {
+    id: "fold-parallel", title: "A · Folded, mandra alongside",
+    note: "Your sketch 1. Madhya runs anticlockwise from S, turns at Ṡ, and tara comes back clockwise on the outer ring. Mandra runs alongside madhya on the inner ring (Ṇ beside R, Ḍ beside G). Neighbours across a sthayi boundary stay close, but each sthayi has its own ring.",
+    build: foldedLayout("parallel"),
+  },
+  {
+    id: "fold-opposite", title: "B · Folded, mandra opposite",
+    note: "Your sketch 2. Same madhya and tara, but mandra continues clockwise from S on the inner ring, into the empty lower-left, so it never sits under madhya.",
+    build: foldedLayout("opposite"),
+  },
+  {
+    id: "spiral", title: "C · Spiral, S at bottom",
+    note: "One continuous line from mandra to tara. Each turn is one sthayi, every S lines up at the bottom, and pitch rises as you move outward. The catch: halfway round each turn (after M₂), the path heads back down the right side.",
+    build(W, H, rs) {
+      const S = Math.min(W, H), cx = W / 2, cy = H / 2;
+      const r0 = S * 0.07, gap = S * 0.135;
+      const rad = p => r0 + (p + 12) / 12 * gap;
+      const regions = rs.all.map(([sw, st]) => {
+        const p = absPos(sw, st);
+        return { sw, st, ...sector(cx, cy, rad(p), gap * 0.78, ANG(((p % 12) + 12) % 12), Math.PI / 12 * 0.86) };
+      });
+      const decor = (ctx, pal) => {
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = pal.guide;
+        ctx.beginPath();
+        for (let t = -12; t <= 24; t += 0.1) {
+          const x = cx + Math.cos(ANG(t)) * rad(t), y = cy + Math.sin(ANG(t)) * rad(t);
+          t === -12 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ticks(ctx, cx, cy, rad(-12) * 0.6, rad(24), k => ANG(k), rs.set, pal);
+      };
+      return { regions, decor, hub: { x: cx, y: cy, r: r0 * 1.05 } };
+    },
+  },
+  {
+    id: "ring", title: "D · Full ring, S at bottom",
+    note: "A full madhya ring with partial mandra (inside) and tara (outside) arcs at the same angles, so Ṡ sits right outside S. Biggest targets, and the raga's shape reads clearly, but the right half of each ring runs downward while pitch goes up.",
+    build(W, H, rs) {
+      const S = Math.min(W, H), cx = W / 2, cy = H / 2;
+      const radius = { mandra: S * 0.2, madhya: S * 0.31, tara: S * 0.42 };
+      const regions = rs.all.map(([sw, st]) =>
+        ({ sw, st, ...sector(cx, cy, radius[st], S * 0.095, ANG(POS[sw]), Math.PI / 12 * 0.86) }));
+      const decor = (ctx, pal) => {
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = pal.guide;
+        Object.values(radius).forEach(r => { ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke(); });
+        ticks(ctx, cx, cy, S * 0.14, S * 0.48, k => ANG(k), rs.set, pal);
+      };
+      return { regions, decor, hub: { x: cx, y: cy, r: S * 0.13 } };
+    },
+  },
+];
+
+function shapePath(ctx, g) {
+  ctx.beginPath();
+  if (g.type === "circle") { ctx.arc(g.x, g.y, g.r, 0, Math.PI * 2); return; }
+  ctx.arc(g.cx, g.cy, g.r1, g.a - g.half, g.a + g.half);
+  ctx.arc(g.cx, g.cy, g.r0, g.a + g.half, g.a - g.half, true);
+  ctx.closePath();
+}
+
+// trail: speed-adaptive smoothing + chaikin rounding + one tapered ribbon (same approach as the app)
+function smoothPoint(prev, raw) {
+  if (!prev) return raw;
+  const speed = Math.hypot(raw.x - prev.x, raw.y - prev.y);
+  const a = Math.min(0.8, 0.2 + 0.6 * speed / 80);
+  return { x: prev.x + (raw.x - prev.x) * a, y: prev.y + (raw.y - prev.y) * a };
+}
+function roundCorners(pts, it = 2) {
+  for (let k = 0; k < it; k++) {
+    const next = [pts[0]];
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i], b = pts[i + 1];
+      next.push({ x: .75 * a.x + .25 * b.x, y: .75 * a.y + .25 * b.y }, { x: .25 * a.x + .75 * b.x, y: .25 * a.y + .75 * b.y });
+    }
+    next.push(pts[pts.length - 1]);
+    pts = next;
+  }
+  return pts;
+}
+function drawTrail(ctx, points, pal) {
+  if (points.length < 3) return;
+  const pts = roundCorners(points), n = pts.length, L = [], R = [];
+  for (let i = 0; i < n; i++) {
+    const b = pts[Math.max(0, i - 1)], f = pts[Math.min(n - 1, i + 1)];
+    const len = Math.hypot(f.x - b.x, f.y - b.y) || 1;
+    const nx = -(f.y - b.y) / len, ny = (f.x - b.x) / len, w = 0.3 + 4 * i / (n - 1);
+    L.push({ x: pts[i].x + nx * w, y: pts[i].y + ny * w });
+    R.push({ x: pts[i].x - nx * w, y: pts[i].y - ny * w });
+  }
+  const t = pts[0], h = pts[n - 1];
+  let fill = rgba(pal.trail[1], .5);
+  if (Math.hypot(h.x - t.x, h.y - t.y) > 2) {
+    fill = ctx.createLinearGradient(t.x, t.y, h.x, h.y);
+    fill.addColorStop(0, rgba(pal.trail[0], 0));
+    fill.addColorStop(.5, rgba(pal.trail[0], .55));
+    fill.addColorStop(1, rgba(pal.trail[1], .95));
+  }
+  ctx.save();
+  ctx.beginPath();
+  L.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y));
+  for (let i = n - 1; i >= 0; i--) ctx.lineTo(R[i].x, R[i].y);
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.shadowColor = pal.trail[1];
+  ctx.shadowBlur = 12;
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(h.x, h.y, 5, 0, Math.PI * 2);
+  ctx.fillStyle = pal.trail[1];
+  ctx.fill();
+  ctx.restore();
+}
+
+// quiet pluck so clicking feels like playing
+let audio;
+function pluck(sw, st) {
+  audio = audio || new AudioContext();
+  const f = 261.63 * Math.pow(2, absPos(sw, st) / 12);
+  const o = audio.createOscillator(), g = audio.createGain();
+  o.type = "triangle"; o.frequency.value = f;
+  g.gain.setValueAtTime(0.0001, audio.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.12, audio.currentTime + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 1.2);
+  o.connect(g).connect(audio.destination);
+  o.start(); o.stop(audio.currentTime + 1.3);
+}
+
+const cards = LAYOUTS.map(layout => {
+  const el = document.createElement("section");
+  el.className = "card";
+  el.innerHTML = `<div class="meta"><h2>${layout.title}</h2><p>${layout.note}</p></div><canvas></canvas>`;
+  document.getElementById("cards").appendChild(el);
+  const canvas = el.querySelector("canvas");
+  const card = { layout, canvas, ctx: canvas.getContext("2d"), mouse: null, smooth: null, trail: [], hover: null, W: 0, H: 0, built: null };
+
+  canvas.addEventListener("mousemove", e => {
+    const r = canvas.getBoundingClientRect();
+    card.mouse = { x: e.clientX - r.left, y: e.clientY - r.top };
+  });
+  canvas.addEventListener("mouseleave", () => { card.mouse = null; card.trail = []; card.smooth = null; });
+  canvas.addEventListener("click", () => {
+    const g = card.hover;
+    if (!g || !reachable(state.current, g.sw, g.st, state.raga)) return;
+    state.current = { swara: g.sw, sthayi: g.st };
+    state.played = { sw: g.sw, st: g.st, at: performance.now() };
+    pluck(g.sw, g.st);
+  });
+  return card;
+});
+
+function resize() {
+  const dpr = window.devicePixelRatio || 1;
+  cards.forEach(c => {
+    c.W = c.canvas.clientWidth; c.H = c.canvas.clientHeight;
+    c.canvas.width = Math.round(c.W * dpr); c.canvas.height = Math.round(c.H * dpr);
+    c.dpr = dpr; c.built = null;
+  });
+}
+
+function drawCard(c, now) {
+  const pal = PALETTES[state.palette], ctx = c.ctx, { W, H } = c;
+  const rs = ragaSwaras(state.raga);
+  if (!c.built) c.built = c.layout.build(W, H, rs);
+  const { regions, decor, hub } = c.built;
+
+  ctx.setTransform(c.dpr, 0, 0, c.dpr, 0, 0);
+  ctx.fillStyle = pal.bg;
+  ctx.fillRect(0, 0, W, H);
+  const glow = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.max(W, H) * .6);
+  glow.addColorStop(0, rgba(pal.accent, .06)); glow.addColorStop(1, rgba(pal.accent, 0));
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
+
+  decor(ctx, pal);
+
+  c.hover = c.mouse ? regions.find(g => contains(g, c.mouse.x, c.mouse.y)) || null : null;
+  const S = Math.min(W, H);
+
+  regions.forEach(g => {
+    const ok = reachable(state.current, g.sw, g.st, state.raga);
+    const tint = pal.sthayi[g.st];
+    const isHover = c.hover === g;
+    const p = state.played;
+    const flare = p && p.sw === g.sw && p.st === g.st ? Math.max(0, 1 - (now - p.at) / 450) : 0;
+
+    shapePath(ctx, g);
+    ctx.fillStyle = ok ? rgba(tint, isHover ? .34 : .14) : rgba("#888888", .05);
+    ctx.fill();
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = ok ? rgba(tint, isHover ? .9 : .5) : pal.muted;
+    ctx.stroke();
+    if (flare > 0) {
+      ctx.save();
+      ctx.shadowColor = pal.flare; ctx.shadowBlur = 26 * flare;
+      ctx.fillStyle = rgba(pal.flare, .55 * flare);
+      shapePath(ctx, g); ctx.fill();
+      ctx.restore();
+    }
+
+    ctx.fillStyle = ok ? pal.ink : pal.muted;
+    ctx.font = `${Math.round(S * (g.type === "circle" ? .042 : .045))}px "Noto Serif", Georgia, serif`;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(swaraLabel(g.sw, g.st), g.lx, g.ly);
+  });
+
+  // hub / status: what you're on right now
+  const shown = c.hover || (state.played && now - state.played.at < 1500 ? state.played : null);
+  if (hub) {
+    ctx.beginPath(); ctx.arc(hub.x, hub.y, hub.r, 0, Math.PI * 2);
+    ctx.strokeStyle = pal.guide; ctx.lineWidth = 1; ctx.stroke();
+  }
+  if (shown) {
+    const x = hub ? hub.x : W / 2, y = hub ? hub.y : H * .13;
+    ctx.fillStyle = pal.ink; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.font = `600 ${Math.round(S * .075)}px "Noto Serif", Georgia, serif`;
+    ctx.fillText(swaraLabel(shown.sw, shown.st), x, y - S * .012);
+    ctx.font = `${Math.round(S * .028)}px "Noto Sans", sans-serif`;
+    ctx.fillStyle = rgba(pal.ink, .6);
+    ctx.fillText(shown.st, x, y + S * .045);
+  }
+
+  if (c.mouse) {
+    c.smooth = smoothPoint(c.smooth, c.mouse);
+    c.trail.push(c.smooth);
+    if (c.trail.length > 18) c.trail.shift();
+    drawTrail(ctx, c.trail, pal);
+  }
+}
+
+function frame(now) {
+  cards.forEach(c => drawCard(c, now));
+  requestAnimationFrame(frame);
+}
+
+// controls
+const paletteBar = document.getElementById("palettes");
+Object.entries(PALETTES).forEach(([key, pal]) => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.innerHTML = `<span class="dots">${[pal.bg, pal.sthayi.mandra, pal.sthayi.madhya, pal.sthayi.tara].map(c => `<i style="background:${c}"></i>`).join("")}</span>${pal.name}`;
+  b.onclick = () => setPalette(key);
+  b.dataset.key = key;
+  paletteBar.appendChild(b);
+});
+function setPalette(key) {
+  state.palette = key;
+  const pal = PALETTES[key], root = document.documentElement.style;
+  root.setProperty("--bg", pal.bg); root.setProperty("--ink", pal.ink);
+  root.setProperty("--accent", pal.accent); root.setProperty("--line", pal.line);
+  [...paletteBar.children].forEach(b => b.classList.toggle("on", b.dataset.key === key));
+}
+
+const ragaSelect = document.getElementById("raga");
+RAGAS.forEach((r, i) => ragaSelect.add(new Option(r.name, i)));
+ragaSelect.onchange = () => { state.raga = RAGAS[ragaSelect.value]; state.current = null; cards.forEach(c => c.built = null); };
+document.getElementById("reset").onclick = () => { state.current = null; state.played = null; };
+
+const urlPalette = new URLSearchParams(location.search).get("palette");
+setPalette(PALETTES[urlPalette] ? urlPalette : "lamp");
+resize();
+window.addEventListener("resize", resize);
+document.fonts?.ready.then(() => cards.forEach(c => c.built = null));
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

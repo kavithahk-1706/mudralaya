@@ -1,44 +1,28 @@
-export function flipCoords(x, y, canvas) {
-  return { x: canvas.width - x, y };
+import theme from "./theme";
+
+// rect the camera frame occupies when scaled to cover a W x H viewport (like object-fit: cover)
+export function getCoverFrame(imageWidth, imageHeight, W, H) {
+  const scale = Math.max(W / imageWidth, H / imageHeight);
+  const w = imageWidth * scale;
+  const h = imageHeight * scale;
+  return { x: (W - w) / 2, y: (H - h) / 2, w, h };
 }
 
-export function flipLandmark(landmark, canvas) {
+// normalized mediapipe landmark -> mirrored viewport (css px) coords
+export function landmarkToScreen(landmark, frame) {
   return {
-    x: canvas.width - landmark.x * canvas.width,
-    y: landmark.y * canvas.height,
- 
+    x: frame.x + (1 - landmark.x) * frame.w,
+    y: frame.y + landmark.y * frame.h,
   };
 }
 
-export function returnLandmark(landmark,canvas){
-    return{
-        x:landmark.x*canvas.width,
-        y:landmark.y*canvas.height,
-    }
+export function drawBackground(ctx, W, H) {
+  ctx.fillStyle = theme.bg;
+  ctx.fillRect(0, 0, W, H);
+
+  const glow = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.max(W, H) * 0.6);
+  glow.addColorStop(0, theme.bgGlow);
+  glow.addColorStop(1, "rgba(0, 0, 0, 0)");
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
 }
-
-export function drawText(ctx, text, x, y, options = {}) {
-  const {
-    font = "24px Arial",
-    fillStyle = "#000",
-    textAlign = "start",
-    textBaseline = "alphabetic"
-  } = options;
-
-  ctx.save(); // Save flipped state
-  ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset to normal orientation
-  ctx.font = font;
-  ctx.fillStyle = fillStyle;
-  ctx.textAlign = textAlign;
-  ctx.textBaseline = textBaseline;
-  ctx.fillText(text, x, y);
-  ctx.restore(); // Restore flipped state
-}
-
-
-export function toSubscript(num){
-  const subscripts = ['₀','₁','₂','₃','₄','₅','₆','₇','₈','₉'];
-  return num.split('').map(d => subscripts[parseInt(d)]).join('');
-};
-
-

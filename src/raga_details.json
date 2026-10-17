@@ -4,14 +4,12 @@
     "type": "Melakarta",
     "arohana": ["S", "R1", "G3", "M1", "P", "D1", "N3", "S"],
     "avarohana": ["S", "N3", "D1", "P", "M1", "G3", "R1", "S"]
-
   },
   {
     "name": "Shankarabharanam",
     "type": "Melakarta",
     "arohana": ["S", "R2", "G3", "M1", "P", "D2", "N3", "S"],
     "avarohana": ["S", "N3", "D2", "P", "M1", "G3", "R2", "S"]
-
   },
   {
     "name": "Kalyani",
@@ -20,10 +18,34 @@
     "avarohana": ["S", "N3", "D2", "P", "M2", "G3", "R2", "S"]
   },
   {
-    "name":"Harikambhoji",
-    "type":"Melakarta",
-    "arohana":["S","R2","G3","M1","P","D2","N2","S"],
-    "avarohana":["S","N2","D2","P","M1","G3","R2","S"]
+    "name": "Harikambhoji",
+    "type": "Melakarta",
+    "arohana": ["S", "R2", "G3", "M1", "P", "D2", "N2", "S"],
+    "avarohana": ["S", "N2", "D2", "P", "M1", "G3", "R2", "S"]
+  },
+  {
+    "name": "Hanumatodi",
+    "type": "Melakarta",
+    "arohana": ["S", "R1", "G2", "M1", "P", "D1", "N2", "S"],
+    "avarohana": ["S", "N2", "D1", "P", "M1", "G2", "R1", "S"]
+  },
+  {
+    "name": "Natabhairavi",
+    "type": "Melakarta",
+    "arohana": ["S", "R2", "G2", "M1", "P", "D1", "N2", "S"],
+    "avarohana": ["S", "N2", "D1", "P", "M1", "G2", "R2", "S"]
+  },
+  {
+    "name": "Kharaharapriya",
+    "type": "Melakarta",
+    "arohana": ["S", "R2", "G2", "M1", "P", "D2", "N2", "S"],
+    "avarohana": ["S", "N2", "D2", "P", "M1", "G2", "R2", "S"]
+  },
+  {
+    "name": "Charukesi",
+    "type": "Melakarta",
+    "arohana": ["S", "R2", "G3", "M1", "P", "D1", "N2", "S"],
+    "avarohana": ["S", "N2", "D1", "P", "M1", "G3", "R2", "S"]
   },
   {
     "name": "Mohana",
@@ -39,7 +61,6 @@
     "avarohana": ["S", "N3", "P", "G3", "R2", "S"],
     "parent": "Shankarabharanam"
   },
-  
   {
     "name": "Malahari",
     "type": "Janya (Audava Shadava)",
@@ -47,7 +68,6 @@
     "avarohana": ["S", "D1", "P", "M1", "G3", "R1", "S"],
     "parent": "Mayamalavagowla"
   },
-
   {
     "name": "Hindolam",
     "type": "Janya (Audava)",
@@ -55,15 +75,13 @@
     "avarohana": ["S", "N2", "D1", "M1", "G2", "S"],
     "parent": "Natabhairavi"
   },
-
   {
     "name": "Arabhi",
     "type": "Janya (Audava Sampurna)",
-    "arohana": ["S","R2","M1","P","D2","S"],
-    "avarohana":["S","N3","D2","P","M1","G3","R2","S"],
+    "arohana": ["S", "R2", "M1", "P", "D2", "S"],
+    "avarohana": ["S", "N3", "D2", "P", "M1", "G3", "R2", "S"],
     "parent": "Shankarabharanam"
   },
-  
   {
     "name": "Shuddha Saveri",
     "type": "Janya (Audava)",
@@ -75,7 +93,70 @@
     "name": "Niroshta",
     "type": "Janya (Audava)",
     "arohana": ["S", "R2", "G3", "D2", "N3", "S"],
-    "avarohana": ["S", "N3", "D2","G3", "R2", "S"],
+    "avarohana": ["S", "N3", "D2", "G3", "R2", "S"],
     "parent": "Shankarabharanam"
+  },
+  {
+    "name": "Saveri",
+    "type": "Janya (Audava Sampurna)",
+    "parent": "Mayamalavagowla",
+    "arohana": ["S", "R1", "M1", "P", "D1", "S"],
+    "avarohana": ["S", "N3", "D1", "P", "M1", "G3", "R1", "S"]
+  },
+  {
+    "name": "Mohanakalyani",
+    "type": "Janya (Audava Sampurna)",
+    "parent": "Kalyani",
+    "arohana": ["S", "R2", "G3", "P", "D2", "S"],
+    "avarohana": ["S", "N3", "D2", "P", "M2", "G3", "R2", "S"]
+  },
+  {
+    "name": "Kedaragaula",
+    "type": "Janya (Audava Sampurna)",
+    "parent": "Harikambhoji",
+    "arohana": ["S", "R2", "M1", "P", "N2", "S"],
+    "avarohana": ["S", "N2", "D2", "P", "M1", "G3", "R2", "S"]
+  },
+  {
+    "name": "Rudrapriya",
+    "type": "Janya (Sampurna Shadava)",
+    "parent": "Kharaharapriya",
+    "arohana": ["S", "R2", "G2", "M1", "P", "D2", "N2", "S"],
+    "avarohana": ["S", "N2", "P", "M1", "G2", "R2", "S"]
+  },
+  {
+    "name": "Sriranjani",
+    "type": "Janya (Shadava)",
+    "parent": "Kharaharapriya",
+    "arohana": ["S", "R2", "G2", "M1", "D2", "N2", "S"],
+    "avarohana": ["S", "N2", "D2", "M1", "G2", "R2", "S"]
+  },
+  {
+    "name": "Hamsanandi",
+    "type": "Janya (Shadava)",
+    "parent": "Gamanashrama",
+    "arohana": ["S", "R1", "G3", "M2", "D2", "N3", "S"],
+    "avarohana": ["S", "N3", "D2", "M2", "G3", "R1", "S"]
+  },
+  {
+    "name": "Madhyamavati",
+    "type": "Janya (Audava)",
+    "parent": "Kharaharapriya",
+    "arohana": ["S", "R2", "M1", "P", "N2", "S"],
+    "avarohana": ["S", "N2", "P", "M1", "R2", "S"]
+  },
+  {
+    "name": "Abhogi",
+    "type": "Janya (Audava)",
+    "parent": "Kharaharapriya",
+    "arohana": ["S", "R2", "G2", "M1", "D2", "S"],
+    "avarohana": ["S", "D2", "M1", "G2", "R2", "S"]
+  },
+  {
+    "name": "Gambhira Nata",
+    "type": "Janya (Audava)",
+    "parent": "Chalanata",
+    "arohana": ["S", "G3", "M1", "P", "N3", "S"],
+    "avarohana": ["S", "N3", "P", "M1", "G3", "S"]
   }
 ]
