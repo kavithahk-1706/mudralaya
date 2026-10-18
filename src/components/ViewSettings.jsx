@@ -66,7 +66,7 @@ function Chip({ active, disabled, onClick, children, title }) {
   );
 }
 
-// mouse-only panel for palette, camera overlay + finger trail
+// panel for palette, camera overlay, chakra layout + finger trail (mouse or pinch)
 export default function ViewSettings({ viewSettings, updateViewSettings }) {
   const [open, setOpen] = useState(false);
   usePalette(); // re-render on palette change
@@ -148,6 +148,34 @@ export default function ViewSettings({ viewSettings, updateViewSettings }) {
               onChange={e => updateViewSettings({ cameraBlurPx: Number(e.target.value) })}
               style={{ accentColor: theme.accent }}
             />
+          </Row>
+
+          <Row label="Tara & mandra swaras">
+            <div className="grid grid-cols-2 gap-1">
+              {[["full", "Full sthayi"], ["partial", "Partial arcs"]].map(([value, label]) => (
+                <Chip
+                  key={value}
+                  active={viewSettings.sthayiExtent === value}
+                  onClick={() => updateViewSettings({ sthayiExtent: value })}
+                >
+                  {label}
+                </Chip>
+              ))}
+            </div>
+          </Row>
+
+          <Row label="Mandra ring">
+            <div className="grid grid-cols-2 gap-1">
+              {[["opposite", "Opposite"], ["alongside", "Alongside"]].map(([value, label]) => (
+                <Chip
+                  key={value}
+                  active={viewSettings.mandraLayout === value}
+                  onClick={() => updateViewSettings({ mandraLayout: value })}
+                >
+                  {label}
+                </Chip>
+              ))}
+            </div>
           </Row>
 
           <Row label="Finger trail" hint={!cameraVisible ? "required without camera" : null}>

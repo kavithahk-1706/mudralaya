@@ -9,6 +9,8 @@ export const DEFAULT_VIEW_SETTINGS = {
   cameraOpacity: 0.2,
   cameraBlurPx: 5,
   trailEnabled: true,
+  mandraLayout: "opposite", // opposite | alongside, see buildChakra
+  sthayiExtent: "full", // full | partial tara and mandra, see ragaSwaras
 };
 
 const loadSettings = () => {

@@ -21,12 +21,15 @@ It's more of a companion to your musical journey. Like a way to visualize and in
 
 ## Features
 
-- **Hand Tracking Music**: Play swaras by moving your hand across the screen and pinching
-- **Multiple Ragas**: Choose from various classical ragas including Mayamalavagowla, Shankarabharanam, Kalyani, and more
+- **Hand Tracking Music**: Play swaras by moving your index finger over the swara chakra and pinching
+- **Swara Chakra**: Swaras laid out on a wheel, with Mandra, Madhya and Tara sthayis on their own rings
+- **Multiple Ragas**: Choose from melakarta and janya ragas including Mayamalavagowla, Shankarabharanam, Kalyani, Hindolam, and more
 - **Instrument Selection**: Switch between Veena, Sitar, Flute, and Violin
 - **Pitch Adjustment**: Adjust base pitch from -6 to +6 semitones to match your vocal range
-- **Recording**: Record your performances and save them for later playback (requires login)
-- **Three Sthayis**: Play across Mandra (lower), Madhya (middle), and Tara (upper) octaves
+- **View Panel**: Configure the palette, camera overlay, chakra layout and finger trail (gear button, right side)
+- **Guide**: A legend for the chakra that follows your palette, raga and layout (compass button, left side)
+- **Palettes**: Dark and light palettes, shared across every page
+- **Recording**: Record your performances and play them back with a seekable progress bar (requires login). Switching raga, instrument or pitch mid-recording is saved note by note.
 
 ## Tech Stack
 
@@ -34,17 +37,44 @@ It's more of a companion to your musical journey. Like a way to visualize and in
 - **Hand Tracking**: MediaPipe Hands
 - **Audio**: Tone.js
 - **Authentication**: Firebase Auth (Google Sign-In)
-- **Database**: Firebase Firestore (for recordings)
+- **Database**: Firebase Realtime Database (for recordings)
 - **Deployment**: Vercel
 
 ## How It Works
 
 1. Your webcam captures your hand movements
 2. MediaPipe processes the video and identifies hand landmarks
-3. The application maps your fingertip position to specific swaras based on the selected raga
-4. Pinching your thumb and index finger triggers the note
-5. Move vertically to switch between octaves (sthayis)
-6. Move horizontally to play different notes within the raga
+3. The application maps your index fingertip onto the swara chakra for the selected raga
+4. Pinching your thumb and index finger triggers the note; keep pinching and slide to play the next swara
+5. The webcam feed itself is never shown directly: you see the chakra, an optional dimmed camera overlay, and a trail behind your index finger
+
+## The Swara Chakra
+
+The swaras sit on a wheel with three rings:
+
+- **Madhya sthayi** (middle ring): starts at S at the bottom and rises anticlockwise, up the right side and over the top, towards Ṡ on the left
+- **Tara sthayi** (outer ring, dot above, e.g. Ṡ): carries on from Ṡ, rising clockwise along the outer ring
+- **Mandra sthayi** (inner ring, dot below, e.g. Ṣ): falls from S along the inner ring. Its direction depends on the *Mandra ring* setting: clockwise, away from madhya (**Opposite**), or anticlockwise, just inside madhya (**Alongside**)
+
+S and Ṡ are the turning points: S spans the madhya and mandra rings, Ṡ spans madhya and tara. Each swara sits at its true swarasthana, so a raga's shape is visible on the wheel. After you play a note, swaras that the raga's arohana (going up) or avarohana (going down) doesn't allow next are greyed out.
+
+## The View Panel (gear button)
+
+Open it with the gear button on the right of the playground, by mouse or by pinching over it. Every option is remembered for your next visit.
+
+- **Palette**: pick a dark or light palette. The same palette applies to the home, playground and recordings pages, and the home and recordings pages also have a palette button in the top bar.
+- **Camera**: turn the camera overlay on or off. Hand tracking keeps working either way.
+- **Position**: place the camera in a corner, on the left or right side, or full screen behind the chakra.
+- **Size**: small, medium or large (for corner and side positions).
+- **Opacity**: how strongly the camera shows through, so it never competes with the swaras.
+- **Blur**: soften the camera feed so you see roughly where your hand is without the detail.
+- **Tara & mandra swaras**: **Full sthayi** shows every swara of the raga in tara and mandra; **Partial arcs** shows only the ones closest to madhya.
+- **Mandra ring**: **Opposite** or **Alongside** (see above).
+- **Finger trail**: a glowing trail behind your index finger. It can be turned off while the camera is on, and is always on when the camera is off, since it's then your only reference for where your hand is.
+
+## The Guide (compass button)
+
+The compass button on the left of the playground opens a guide to the chakra: a small live copy of the wheel with arrows showing which way each sthayi moves, the colour of each sthayi in the current palette, and how to play. It updates with your raga, palette and View settings.
 
 ## Running Locally
 
@@ -90,9 +120,10 @@ npm run dev
 1. **Select a Raga**: Choose from the dropdown menu
 2. **Select an Instrument**: Pick your preferred instrument sound
 3. **Adjust Pitch** (optional): Change the base pitch to match your comfort
-4. **Position Your Hand**: Hold your hand in front of the camera
-5. **Play**: Move your hand across the screen and pinch to play notes
-6. **Record**: Login with Google to save your recordings
+4. **Set up the view** (optional): Use the gear button to set the palette, camera, chakra layout and trail
+5. **Position Your Hand**: Hold your hand in front of the camera
+6. **Play**: Move your index finger over the chakra and pinch to play notes. Open the compass guide if you're unsure where a sthayi is.
+7. **Record**: Login with Google to save your recordings, then play them back from the Recordings page
 
 ## Musical Context
 

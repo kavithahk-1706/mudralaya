@@ -13,6 +13,7 @@ import { signInWithPopup } from 'firebase/auth';
 import useRecording from "../hooks/useRecording";
 import RecordButton from "../components/RecordButton";
 import ViewSettings from "../components/ViewSettings";
+import ChakraGuide from "../components/ChakraGuide";
 import useViewSettings from "../hooks/useViewSettings";
 import usePalette from "../hooks/usePalette";
 import { ControlButton } from "../components/Controls";
@@ -292,6 +293,7 @@ export default function Playground({
       <canvas ref={canvasRef} style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh' }} />
 
       <ViewSettings viewSettings={viewSettings} updateViewSettings={updateViewSettings} />
+      <ChakraGuide raga={ragaData.find(r => r.name === selectedRaga)} viewSettings={viewSettings} />
 
       {/* controls float in two slim bars that fade into the canvas instead of boxing it in */}
       <div

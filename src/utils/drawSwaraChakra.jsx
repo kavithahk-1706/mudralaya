@@ -31,13 +31,20 @@ export function swaraLabel(swara, sthayi) {
   return letter + dot + (number ? [...number].map(d => SUBSCRIPTS[d]).join("") : "");
 }
 
-// same sthayi subsets the old row layout used
-function ragaSwaras(raga) {
+// sthayiExtent "full": tara and mandra get the raga's full set of swaras (Ṣ..Ṇ, Ṡ..Ṅ).
+// "partial": only the swaras nearest madhya, like the original row layout
+// (tara from Ṡ up through about half the raga, mandra from Ṇ down through about half of it)
+export function ragaSwaras(raga, sthayiExtent = "full") {
   const set = new Set([...(raga.arohana || []), ...(raga.avarohana || [])]);
-  const madhya = SWARA_ORDER.filter(sw => set.has(sw));
-  const tara = madhya.slice(0, Math.ceil(madhya.length / 2) + 1);
-  const mandra = (raga.avarohana || []).slice(1, Math.ceil((raga.avarohana || []).length / 2) + 1);
-  return { madhya, tara, mandra };
+  const swaras = SWARA_ORDER.filter(sw => set.has(sw));
+  if (sthayiExtent !== "partial") return { madhya: swaras, tara: swaras, mandra: swaras };
+
+  const avarohana = raga.avarohana || [];
+  return {
+    madhya: swaras,
+    tara: swaras.slice(0, Math.ceil(swaras.length / 2) + 1),
+    mandra: avarohana.slice(1, Math.ceil(avarohana.length / 2) + 1),
+  };
 }
 
 function sector(cx, cy, r0, r1, angle, hitPad) {
@@ -56,9 +63,11 @@ function sector(cx, cy, r0, r1, angle, hitPad) {
 // folded layout: madhya runs anticlockwise from S, turns at Ṡ and tara comes back clockwise on the
 // outer ring; mandra runs clockwise from S on the inner ring. S and Ṡ are the hinges, so they span
 // the two rings they join.
-export function buildChakra(raga, cx, cy, size) {
+// mandraLayout: "opposite" runs mandra clockwise from S into the free lower side;
+// "alongside" runs it anticlockwise under madhya, so Ṇ sits beside R and Ṣ beneath Ṡ
+export function buildChakra(raga, cx, cy, size, { mandraLayout = "opposite", sthayiExtent = "full" } = {}) {
   if (!raga) return [];
-  const { madhya, tara, mandra } = ragaSwaras(raga);
+  const { madhya, tara, mandra } = ragaSwaras(raga, sthayiExtent);
   const half = (RING_WIDTH * size) / 2;
   const hitPad = (RING_GAP * size) / 2;
   const ring = st => [RING[st] * size - half, RING[st] * size + half];
@@ -74,9 +83,11 @@ export function buildChakra(raga, cx, cy, size) {
     const [r0, r1] = j === 0 ? [ring("madhya")[0], ring("tara")[1]] : ring("tara");
     regions.push({ swara: sw, sthayi: "tara", ...sector(cx, cy, r0, r1, slotAngle(12 - j), hitPad) });
   });
+  // mandra runs clockwise from S, so Ṣ itself lands 12 slots round, opposite madhya's turn at Ṡ
   mandra.forEach(sw => {
-    const below = 12 - SWARA_POS[sw]; // semitones below S
-    regions.push({ swara: sw, sthayi: "mandra", ...sector(cx, cy, ...ring("mandra"), slotAngle(-below), hitPad) });
+    const below = 12 - SWARA_POS[sw]; // semitones below madhya S
+    const slot = mandraLayout === "alongside" ? below : -below;
+    regions.push({ swara: sw, sthayi: "mandra", ...sector(cx, cy, ...ring("mandra"), slotAngle(slot), hitPad) });
   });
 
   return regions;
@@ -125,9 +136,9 @@ function drawWheel(ctx, cx, cy, size, now) {
 }
 
 // draws the chakra and the hub status; returns hit regions
-export function drawSwaraChakra(ctx, { raga, cx, cy, size, currentSwara, hover, played, now }) {
+export function drawSwaraChakra(ctx, { raga, cx, cy, size, layout, currentSwara, hover, played, now }) {
   drawWheel(ctx, cx, cy, size, now);
-  const regions = buildChakra(raga, cx, cy, size);
+  const regions = buildChakra(raga, cx, cy, size, layout);
 
   regions.forEach(g => {
     g.isReachable = currentSwara

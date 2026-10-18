@@ -86,7 +86,8 @@ export default function Home() {
                 'Move your index finger over the swaras on the chakra to hover over them. A glowing trail follows your fingertip.',
                 'Pinch your thumb and index finger to play a note. Keep pinching and slide to play the next swara.',
                 'Pick ragas, instruments and pitch from the menus at the top, by mouse or by pinching over them.',
-                'Use the gear button to show or hide the camera, move it around, and change the palette.',
+                'Use the gear button (right side) to set up your view: palette, camera, chakra layout and finger trail. Details below.',
+                'Open the compass button (left side) for a guide to where each sthayi sits and which way it moves.',
                 <><strong>Login with Google</strong> to unlock <strong>recording and playback</strong>.</>,
               ].map((step, i) => (
                 <li key={i} className="flex gap-4">
@@ -102,12 +103,45 @@ export default function Home() {
             </ol>
           </section>
 
+          {/* View panel + guide */}
+          <section id="view" className="mb-16 scroll-mt-24">
+            <SectionHeading>Setting up your view</SectionHeading>
+            <p className="leading-relaxed mb-6" style={{ color: 'var(--ink-soft)' }}>
+              The <strong style={{ color: 'var(--ink)' }}>gear button</strong> on the right of the playground opens the View panel.
+              You can use it with the mouse or by pinching over it, and everything you choose is remembered for next time.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                ['Palette', 'Pick a dark or light palette. It applies to every page; here you can also use the palette button in the top bar.'],
+                ['Camera', 'Show or hide the camera overlay. Hand tracking keeps working either way.'],
+                ['Position', 'Put the camera in a corner, on the left or right side, or full screen behind the chakra.'],
+                ['Size', 'Small, medium or large, for the corner and side positions.'],
+                ['Opacity & blur', 'Fade and soften the camera so you can tell roughly where your hand is without it competing with the swaras.'],
+                ['Tara & mandra swaras', 'Full sthayi shows every swara of the raga in tara and mandra; partial arcs show only the ones closest to madhya.'],
+                ['Mandra ring', 'Opposite runs mandra clockwise, away from madhya. Alongside runs it anticlockwise, just inside madhya.'],
+                ['Finger trail', 'A glowing trail behind your index finger. Optional with the camera on; always on with the camera off, since it is then your only guide.'],
+              ].map(([title, body]) => (
+                <div key={title} className="card p-4">
+                  <h3 className="serif font-semibold mb-1" style={{ color: 'var(--accent)' }}>{title}</h3>
+                  <p className="text-sm leading-relaxed m-0" style={{ color: 'var(--ink-soft)' }}>{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="card p-5 mt-3" style={{ borderLeft: '3px solid var(--accent)' }}>
+              <h3 className="serif font-semibold mb-1">The guide</h3>
+              <p className="text-sm leading-relaxed m-0" style={{ color: 'var(--ink-soft)' }}>
+                The <strong style={{ color: 'var(--ink)' }}>compass button</strong> on the left opens a guide to the chakra: a small live copy of the wheel with arrows showing which way each sthayi moves,
+                the colour of each sthayi in your palette, and how to play. It changes with your raga, palette and View settings.
+              </p>
+            </div>
+          </section>
+
           {/* What's included */}
           <section id="whats-included" className="mb-16 scroll-mt-24">
             <SectionHeading>What's in here (more on the way!)</SectionHeading>
             <div className="leading-relaxed mb-8 space-y-3" style={{ color: 'var(--ink-soft)' }}>
               <p>
-                The swaras sit on a chakra: madhya sthayi in the middle ring, tara on the outer ring and mandra on the inner ring. A dot above a swara (Ṡ) marks tara sthayi and a dot below (Ṣ) marks mandra.
+                The swaras sit on a chakra: madhya sthayi in the middle ring, tara on the outer ring and mandra on the inner ring. A dot above a swara (Ṡ) marks tara sthayi and a dot below (Ṣ) marks mandra. Madhya rises anticlockwise from S at the bottom; tara carries on clockwise from Ṡ.
                 Each raga has its own <i>arohana</i> (ascending) and <i>avarohana</i> (descending) patterns that decide which <i>swaras</i> (notes) can be played next.
               </p>
               <p>

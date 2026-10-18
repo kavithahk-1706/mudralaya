@@ -143,6 +143,7 @@ export default function useHandTracking({
         raga: ragaData.find(r => r.name === selectedRagaRef.current),
         cx: W / 2,
         cy: theme.barHeight + playH / 2,
+        layout: { mandraLayout: view.mandraLayout, sthayiExtent: view.sthayiExtent },
         size: Math.min(W, playH) * 0.9,
         currentSwara: currentSwaraRef.current,
         hover: hoverRef.current,
